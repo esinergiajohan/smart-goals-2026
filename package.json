@@ -8,6 +8,7 @@
     "issue": "node --env-file=.env fetch-issue.mjs",
     "attach": "node --env-file=.env attach.mjs",
     "comment": "node --env-file=.env comment.mjs",
-    "confluence": "node --env-file=.env confluence.mjs"
+    "confluence": "node --env-file=.env confluence.mjs",
+    "tempo": "node --env-file=.env tempo.mjs"
   }
 }
