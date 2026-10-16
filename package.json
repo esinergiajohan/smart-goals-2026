@@ -1,0 +1,13 @@
+{
+  "name": "jira-mvp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "tasks": "node --env-file=.env fetch-tasks.mjs",
+    "issue": "node --env-file=.env fetch-issue.mjs",
+    "attach": "node --env-file=.env attach.mjs",
+    "comment": "node --env-file=.env comment.mjs",
+    "confluence": "node --env-file=.env confluence.mjs"
+  }
+}

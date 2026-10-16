@@ -1,0 +1,4 @@
+.env
+tasks.json
+node_modules
+publish-log.jsonl
