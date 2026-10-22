@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import type { RepositoryDraft } from '../../../services/repositories.ts'
 import type { TicketBranches, TicketStatus, TrackedTicket } from '../../../types/jira.ts'
+import type { Repository } from '../../../types/review.ts'
 import { classNames } from '../../../utils/classNames.ts'
 import { Badge } from '../../01-atoms/badge/Badge.tsx'
 import { Button } from '../../01-atoms/button/Button.tsx'
@@ -10,26 +12,33 @@ import { ConfirmDialog } from '../../02-molecules/confirm-dialog/ConfirmDialog.t
 import { MetaItem } from '../../02-molecules/meta-item/MetaItem.tsx'
 import { FeaturedComment } from '../featured-comment/FeaturedComment.tsx'
 import { TicketBranches as TicketBranchesPanel } from '../ticket-branches/TicketBranches.tsx'
+import { TicketReview } from '../ticket-review/TicketReview.tsx'
 import './ticket-card.scss'
 
 interface TicketCardProps {
   ticket: TrackedTicket
   status?: TicketStatus
+  repositories: Repository[]
   focusToggle?: boolean
   onRemove: (key: string) => void
   onDeployChange: (key: string, deployed: boolean) => void
   onBranchesChange: (key: string, branches: Partial<TicketBranches>) => void
   onFeaturedCommentChange: (key: string, commentId: string | undefined) => void
+  onRepositoryChange: (key: string, repositoryId: number | undefined) => void
+  onAddRepository: (draft: RepositoryDraft) => Promise<Repository>
 }
 
 export function TicketCard({
   ticket,
   status,
+  repositories,
   focusToggle = false,
   onRemove,
   onDeployChange,
   onBranchesChange,
   onFeaturedCommentChange,
+  onRepositoryChange,
+  onAddRepository,
 }: TicketCardProps) {
   const titleId = `ticket-card-${ticket.key}-title`
   const deployed = Boolean(ticket.deployedAt)
@@ -75,6 +84,13 @@ export function TicketCard({
       />
 
       <TicketBranchesPanel ticket={ticket} onChange={(branches) => onBranchesChange(ticket.key, branches)} />
+
+      <TicketReview
+        ticket={ticket}
+        repositories={repositories}
+        onRepositoryChange={(repositoryId) => onRepositoryChange(ticket.key, repositoryId)}
+        onAddRepository={onAddRepository}
+      />
 
       <footer className="ticket-card__footer">
         <Toggle

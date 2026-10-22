@@ -1,26 +1,14 @@
+import { apiRequest as request } from './api.ts'
 import type { JiraTicket, TicketBranches, TrackedTicket } from '../types/jira.ts'
 
 export interface CardChanges {
   deployedAt?: string | null
   featuredCommentId?: string | null
   branches?: Partial<TicketBranches>
+  repositoryId?: number | null
 }
 
 const CARDS_ROUTE = '/api/cards'
-
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(path, {
-    ...init,
-    headers: init?.body ? { 'Content-Type': 'application/json' } : undefined,
-  })
-  const data: T & { error?: string } = await response.json()
-
-  if (!response.ok) {
-    throw new Error(data.error ?? `El servidor respondió ${response.status}`)
-  }
-
-  return data
-}
 
 const cardPath = (key: string) => `${CARDS_ROUTE}/${encodeURIComponent(key)}`
 

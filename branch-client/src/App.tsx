@@ -4,11 +4,23 @@ import { ActiveTicketColumn } from './components/03-organisms/active-ticket-colu
 import { TicketColumn } from './components/03-organisms/ticket-column/TicketColumn.tsx'
 import { TicketSearch } from './components/03-organisms/ticket-search/TicketSearch.tsx'
 import { useActiveTickets } from './hooks/useActiveTickets.ts'
+import { useRepositories } from './hooks/useRepositories.ts'
 import { useTicketStatuses } from './hooks/useTicketStatuses.ts'
 import { useTicketCards } from './hooks/useTicketCards.ts'
 
 function App() {
-  const { pendingCards, deployedCards, error, addCard, removeCard, setDeployed, setBranches, setFeaturedComment } = useTicketCards()
+  const {
+    pendingCards,
+    deployedCards,
+    error,
+    addCard,
+    removeCard,
+    setDeployed,
+    setBranches,
+    setFeaturedComment,
+    setRepository,
+  } = useTicketCards()
+  const { repositories, addRepository } = useRepositories()
   const active = useActiveTickets()
   const statuses = useTicketStatuses([...pendingCards, ...deployedCards].map((card) => card.key))
   const [movedKey, setMovedKey] = useState<string>()
@@ -25,6 +37,7 @@ function App() {
         tone="pending"
         tickets={pendingCards}
         statuses={statuses}
+        repositories={repositories}
         emptyMessage="Busca un ticket arriba para crear su card."
         error={error}
         focusKey={movedKey}
@@ -32,18 +45,23 @@ function App() {
         onDeployChange={handleDeployChange}
         onBranchesChange={setBranches}
         onFeaturedCommentChange={setFeaturedComment}
+        onRepositoryChange={setRepository}
+        onAddRepository={addRepository}
       />
       <TicketColumn
         title="En producción"
         tone="deployed"
         tickets={deployedCards}
         statuses={statuses}
+        repositories={repositories}
         emptyMessage="Aún no hay tickets desplegados en producción."
         focusKey={movedKey}
         onRemove={removeCard}
         onDeployChange={handleDeployChange}
         onBranchesChange={setBranches}
         onFeaturedCommentChange={setFeaturedComment}
+        onRepositoryChange={setRepository}
+        onAddRepository={addRepository}
       />
       <ActiveTicketColumn
         title="Abiertos, en curso y bloqueados"

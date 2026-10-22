@@ -2,7 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import { desc, eq } from 'drizzle-orm'
 import type { JiraTicket, TicketBranches, TrackedTicket } from '../src/types/jira.ts'
 import type { Db } from './db/client.ts'
-import { tickets } from './db/schema.ts'
+import { repositories, tickets } from './db/schema.ts'
 import { HttpError, readJson, sendJson } from './http.ts'
 import { ISSUE_KEY } from './jira-api.ts'
 
@@ -63,6 +63,12 @@ const parseCommentId = (value: unknown) => {
   return COMMENT_ID.test(id) ? id : invalid('featuredCommentId')
 }
 
+const parseRepositoryId = (db: Db, value: unknown) => {
+  const id = typeof value === 'number' && Number.isInteger(value) ? value : invalid('repositoryId')
+  if (!db.select().from(repositories).where(eq(repositories.id, id)).get()) invalid('repositoryId')
+  return id
+}
+
 const parseTicket = (value: unknown): JiraTicket => {
   if (!isRecord(value)) return invalid('ticket')
   return {
@@ -84,7 +90,16 @@ const parseTrackedTicket = (value: unknown): TrackedTicket => {
   }
 }
 
-const toCard = ({ key, summary, created, updated, deployedAt, featuredCommentId, branches }: TicketRow): TrackedTicket => ({
+const toCard = ({
+  key,
+  summary,
+  created,
+  updated,
+  deployedAt,
+  featuredCommentId,
+  branches,
+  repositoryId,
+}: TicketRow): TrackedTicket => ({
   key,
   summary,
   created,
@@ -92,6 +107,7 @@ const toCard = ({ key, summary, created, updated, deployedAt, featuredCommentId,
   ...(deployedAt && { deployedAt }),
   ...(featuredCommentId && { featuredCommentId }),
   ...(branches && { branches }),
+  ...(repositoryId && { repositoryId }),
 })
 
 const listCards = (db: Db) => db.select().from(tickets).orderBy(desc(tickets.addedAt)).all().map(toCard)
@@ -147,6 +163,9 @@ const updateCard = async (db: Db, key: string, req: IncomingMessage) => {
   }
   if (body.branches !== undefined) {
     changes.branches = { ...current.branches, ...parseBranches(body.branches) }
+  }
+  if (body.repositoryId !== undefined) {
+    changes.repositoryId = parseOptional(body.repositoryId, (id) => parseRepositoryId(db, id))
   }
   if (!Object.keys(changes).length) return { card: toCard(current) }
 

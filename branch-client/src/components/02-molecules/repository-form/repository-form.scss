@@ -1,0 +1,43 @@
+@use '../../00-base' as *;
+
+.repository-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  padding: $space-3;
+  border: 1px solid $color-border-strong;
+  border-radius: $radius-sm;
+  background: $color-surface-raised;
+
+  &__field {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  &__label {
+    color: $color-text-muted;
+    font-size: $font-size-xs;
+  }
+
+  &__control.input {
+    padding: $space-1 $space-2;
+    font-size: $font-size-sm;
+  }
+
+  &__control--mono.input {
+    font-family: $font-family-mono;
+  }
+
+  &__error {
+    color: $color-danger;
+    font-size: $font-size-sm;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $space-2;
+  }
+}

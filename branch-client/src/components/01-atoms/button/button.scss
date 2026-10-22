@@ -24,6 +24,11 @@
     @include focus-ring;
   }
 
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
   &--secondary {
     border-color: $color-border-strong;
     background: $color-surface-raised;

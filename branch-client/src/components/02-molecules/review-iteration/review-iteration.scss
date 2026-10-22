@@ -1,0 +1,135 @@
+@use '../../00-base' as *;
+
+.review-iteration {
+  --review-tone: #{$color-text-muted};
+
+  border: 1px solid $color-border;
+  border-left: 4px solid var(--review-tone);
+  border-radius: $radius-sm;
+  background: $color-surface-raised;
+  font-size: $font-size-sm;
+
+  &--approved {
+    --review-tone: #{$color-emerald-400};
+  }
+
+  &--rejected,
+  &--failed {
+    --review-tone: #{$color-danger};
+  }
+
+  &--pending {
+    --review-tone: #{$color-amber-400};
+  }
+
+  &__summary {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: $space-1 $space-3;
+    padding: $space-2 $space-3;
+    cursor: pointer;
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+
+  &__label {
+    color: $color-text-muted;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &__verdict {
+    color: var(--review-tone);
+    font-weight: $font-weight-semibold;
+  }
+
+  &__date {
+    grid-column: 1 / -1;
+    color: $color-text-subtle;
+    font-size: $font-size-xs;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+    padding: 0 $space-3 $space-3;
+  }
+
+  &__branch,
+  &__location,
+  &__meta {
+    color: $color-text-muted;
+    font-size: $font-size-xs;
+    overflow-wrap: anywhere;
+  }
+
+  &__branch code,
+  &__location,
+  &__meta code {
+    font-family: $font-family-mono;
+  }
+
+  &__text {
+    line-height: 1.5;
+    white-space: pre-line;
+  }
+
+  &__error {
+    color: $color-danger;
+    white-space: pre-line;
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+  }
+
+  &__heading {
+    margin: 0;
+    color: $color-text-muted;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    margin: 0;
+    padding-left: $space-4;
+  }
+
+  &__finding {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  &__severity {
+    color: var(--review-tone);
+  }
+
+  &__comment summary {
+    color: $color-accent;
+    cursor: pointer;
+  }
+
+  &__pre {
+    margin: $space-2 0 0;
+    padding: $space-3;
+    border-radius: $radius-sm;
+    background: $color-surface;
+    font-family: $font-family-base;
+    font-size: $font-size-sm;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+}

@@ -106,10 +106,28 @@ export function useTicketCards() {
     [persist],
   )
 
+  const setRepository = useCallback(
+    (key: string, repositoryId: number | undefined) => {
+      setCards((current) => current.map((card) => (card.key === key ? { ...card, repositoryId } : card)))
+      persist(updateCard(key, { repositoryId: repositoryId ?? null }))
+    },
+    [persist],
+  )
+
   const pendingCards = cards.filter((card) => !card.deployedAt)
   const deployedCards = cards
     .filter((card) => card.deployedAt)
     .sort((a, b) => (b.deployedAt ?? '').localeCompare(a.deployedAt ?? ''))
 
-  return { pendingCards, deployedCards, error, addCard, removeCard, setDeployed, setBranches, setFeaturedComment }
+  return {
+    pendingCards,
+    deployedCards,
+    error,
+    addCard,
+    removeCard,
+    setDeployed,
+    setBranches,
+    setFeaturedComment,
+    setRepository,
+  }
 }

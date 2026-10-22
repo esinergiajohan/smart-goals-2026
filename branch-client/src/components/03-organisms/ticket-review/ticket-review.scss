@@ -1,0 +1,88 @@
+@use '../../00-base' as *;
+
+.ticket-review {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+
+  &__title {
+    margin: 0;
+    color: $color-accent;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__repository {
+    display: grid;
+    grid-template-columns: 6rem 1fr;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  &__label {
+    color: $color-text-muted;
+    font-size: $font-size-xs;
+  }
+
+  &__select {
+    padding: $space-1 $space-2;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    background: $color-surface;
+    color: $color-text;
+    font-size: $font-size-sm;
+
+    &:focus-visible {
+      @include focus-ring;
+      border-color: $color-accent;
+    }
+  }
+
+  &__targets,
+  &__history {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__target {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr auto;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  &__role {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.06em;
+  }
+
+  &__target--dev &__role {
+    color: $color-branch-dev;
+  }
+
+  &__target--stg &__role {
+    color: $color-branch-stg;
+  }
+
+  &__branch {
+    min-width: 0;
+    overflow: hidden;
+    color: $color-text-muted;
+    font-family: $font-family-mono;
+    font-size: $font-size-xs;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__error {
+    color: $color-danger;
+    font-size: $font-size-sm;
+  }
+}

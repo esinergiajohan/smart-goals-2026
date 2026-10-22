@@ -124,19 +124,26 @@ const fetchPendingComment = async (context: JiraContext, key: string, myAccountI
   }
 }
 
-const withJira = async (env: JiraEnv, res: ServerResponse, task: (context: JiraContext) => Promise<unknown>) => {
-  const baseUrl = env.JIRA_BASE_URL?.replace(/\/+$/, '')
-  if (!baseUrl || !env.JIRA_EMAIL || !env.JIRA_API_TOKEN) {
-    sendJson(res, 500, { error: 'Faltan JIRA_BASE_URL, JIRA_EMAIL o JIRA_API_TOKEN en el .env de la raíz del proyecto.' })
-    return
-  }
+const MISSING_ENV = 'Faltan JIRA_BASE_URL, JIRA_EMAIL o JIRA_API_TOKEN en el .env de la raíz del proyecto.'
 
-  const context: JiraContext = {
+const createJiraContext = (env: JiraEnv): JiraContext | null => {
+  const baseUrl = env.JIRA_BASE_URL?.replace(/\/+$/, '')
+  if (!baseUrl || !env.JIRA_EMAIL || !env.JIRA_API_TOKEN) return null
+
+  return {
     baseUrl,
     headers: {
       Authorization: `Basic ${Buffer.from(`${env.JIRA_EMAIL}:${env.JIRA_API_TOKEN}`).toString('base64')}`,
       Accept: 'application/json',
     },
+  }
+}
+
+const withJira = async (env: JiraEnv, res: ServerResponse, task: (context: JiraContext) => Promise<unknown>) => {
+  const context = createJiraContext(env)
+  if (!context) {
+    sendJson(res, 500, { error: MISSING_ENV })
+    return
   }
 
   try {
@@ -255,6 +262,32 @@ const createCommentHandler = (env: JiraEnv) => async (req: IncomingMessage, res:
       },
     }
   })
+}
+
+export const fetchIssueBrief = async (env: JiraEnv, key: string) => {
+  const context = createJiraContext(env)
+  if (!context) throw new Error(MISSING_ENV)
+
+  const issue = await jiraGet<{
+    fields: { summary: string; description?: AdfNode | string; issuetype?: { name: string }; status?: { name: string } }
+  }>(context, `/rest/api/3/issue/${key}?fields=summary,description,issuetype,status`)
+  const description = adfToText(issue.fields.description, '\n')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\s*\n\s*/g, '\n')
+    .trim()
+
+  return [
+    `# ${key} — ${issue.fields.summary}`,
+    '',
+    `- Tipo: ${issue.fields.issuetype?.name ?? 'No informado'}`,
+    `- Estado: ${issue.fields.status?.name ?? 'No informado'}`,
+    `- Enlace: ${context.baseUrl}/browse/${key}`,
+    '',
+    '## Descripción',
+    '',
+    description || 'Sin descripción en Jira.',
+    '',
+  ].join('\n')
 }
 
 export const createJiraRoutes = (env: JiraEnv): Record<string, (req: IncomingMessage, res: ServerResponse) => Promise<void>> => ({

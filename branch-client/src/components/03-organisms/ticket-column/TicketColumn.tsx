@@ -1,5 +1,7 @@
 import { useId } from 'react'
+import type { RepositoryDraft } from '../../../services/repositories.ts'
 import type { TicketBranches, TicketStatus, TrackedTicket } from '../../../types/jira.ts'
+import type { Repository } from '../../../types/review.ts'
 import { classNames } from '../../../utils/classNames.ts'
 import { TicketCard } from '../ticket-card/TicketCard.tsx'
 import './ticket-column.scss'
@@ -9,6 +11,7 @@ interface TicketColumnProps {
   tone: 'pending' | 'deployed'
   tickets: TrackedTicket[]
   statuses: Record<string, TicketStatus>
+  repositories: Repository[]
   emptyMessage: string
   error?: string
   focusKey?: string
@@ -16,6 +19,8 @@ interface TicketColumnProps {
   onDeployChange: (key: string, deployed: boolean) => void
   onBranchesChange: (key: string, branches: Partial<TicketBranches>) => void
   onFeaturedCommentChange: (key: string, commentId: string | undefined) => void
+  onRepositoryChange: (key: string, repositoryId: number | undefined) => void
+  onAddRepository: (draft: RepositoryDraft) => Promise<Repository>
 }
 
 export function TicketColumn({
@@ -23,6 +28,7 @@ export function TicketColumn({
   tone,
   tickets,
   statuses,
+  repositories,
   emptyMessage,
   error,
   focusKey,
@@ -30,6 +36,8 @@ export function TicketColumn({
   onDeployChange,
   onBranchesChange,
   onFeaturedCommentChange,
+  onRepositoryChange,
+  onAddRepository,
 }: TicketColumnProps) {
   const headingId = useId()
 
@@ -56,11 +64,14 @@ export function TicketColumn({
               <TicketCard
                 ticket={ticket}
                 status={statuses[ticket.key]}
+                repositories={repositories}
                 focusToggle={ticket.key === focusKey}
                 onRemove={onRemove}
                 onDeployChange={onDeployChange}
                 onBranchesChange={onBranchesChange}
                 onFeaturedCommentChange={onFeaturedCommentChange}
+                onRepositoryChange={onRepositoryChange}
+                onAddRepository={onAddRepository}
               />
             </li>
           ))}
