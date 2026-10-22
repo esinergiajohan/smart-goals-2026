@@ -1,0 +1,17 @@
+@use '../../00-base' as *;
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: $space-1 $space-2;
+  border: 1px solid $color-indigo-border;
+  border-radius: $radius-sm;
+  background: $color-indigo-bg;
+  color: $color-indigo-text;
+  font-family: $font-family-mono;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  white-space: nowrap;
+}

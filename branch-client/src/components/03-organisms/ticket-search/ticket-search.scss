@@ -1,0 +1,47 @@
+@use '../../00-base' as *;
+
+.ticket-search {
+  position: relative;
+
+  &__popup {
+    position: absolute;
+    top: calc(100% + #{$space-2});
+    right: 0;
+    left: 0;
+    z-index: $z-dropdown;
+    max-height: 24rem;
+    padding: $space-2;
+    overflow-y: auto;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    background: $color-surface;
+    box-shadow: 0 12px 32px rgb(0 0 0 / 0.5);
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  &__listbox {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  &__message {
+    padding: $space-2 $space-3;
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+
+    &--error {
+      color: $color-danger;
+    }
+  }
+}

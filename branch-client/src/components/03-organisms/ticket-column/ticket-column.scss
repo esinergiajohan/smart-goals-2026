@@ -1,0 +1,57 @@
+@use '../../00-base' as *;
+
+.ticket-column {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__count {
+    padding: 0 $space-2;
+    border-radius: $radius-pill;
+    font-size: $font-size-xs;
+    line-height: 1.6;
+  }
+
+  &--pending &__title {
+    color: $color-amber-300;
+  }
+
+  &--pending &__count {
+    background: $color-amber-950;
+  }
+
+  &--deployed &__title {
+    color: $color-emerald-300;
+  }
+
+  &--deployed &__count {
+    background: $color-emerald-950;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__empty {
+    padding: $space-10 $space-4;
+    border: 1px dashed $color-border-strong;
+    border-radius: $radius-lg;
+    color: $color-text-muted;
+    text-align: center;
+  }
+}

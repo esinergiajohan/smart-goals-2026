@@ -1,0 +1,68 @@
+@use '../../00-base' as *;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-2 $space-3;
+  border: 1px solid transparent;
+  border-radius: $radius-sm;
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    color $transition-fast,
+    background-color $transition-fast,
+    border-color $transition-fast;
+
+  &:hover {
+    color: $color-text;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &--secondary {
+    border-color: $color-border-strong;
+    background: $color-surface-raised;
+
+    &:hover {
+      border-color: $color-text-subtle;
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+
+    &:hover {
+      background: $color-surface-raised;
+    }
+  }
+
+  &--success,
+  &--warning {
+    font-weight: $font-weight-bold;
+  }
+
+  &--success {
+    background: $color-emerald-400;
+    color: $color-emerald-950;
+
+    &:hover {
+      background: $color-emerald-300;
+      color: $color-emerald-950;
+    }
+  }
+
+  &--warning {
+    background: $color-amber-400;
+    color: $color-amber-950;
+
+    &:hover {
+      background: $color-amber-300;
+      color: $color-amber-950;
+    }
+  }
+}

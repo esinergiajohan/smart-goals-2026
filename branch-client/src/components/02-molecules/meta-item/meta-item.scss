@@ -1,0 +1,26 @@
+@use '../../00-base' as *;
+
+.meta-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-2;
+  font-size: $font-size-sm;
+
+  &__icon {
+    color: $color-text-subtle;
+  }
+
+  &__label {
+    color: $color-text-muted;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &__value {
+    color: $color-text;
+    font-weight: $font-weight-semibold;
+  }
+}

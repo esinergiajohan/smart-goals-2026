@@ -1,0 +1,29 @@
+@use '../../00-base' as *;
+
+.dashboard {
+  min-height: 100vh;
+
+  &__header {
+    position: sticky;
+    top: 0;
+    z-index: $z-header;
+    padding: $space-6 $space-4;
+    border-bottom: 1px solid $color-border;
+    background: $color-bg;
+  }
+
+  &__search {
+    max-width: $container-search;
+    margin-inline: auto;
+  }
+
+  &__content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, #{$column-min-width}), 1fr));
+    align-items: start;
+    gap: $space-8 $space-6;
+    max-width: $container-content;
+    margin-inline: auto;
+    padding: $space-8 $space-4;
+  }
+}

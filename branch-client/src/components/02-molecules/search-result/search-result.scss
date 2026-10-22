@@ -1,0 +1,28 @@
+@use '../../00-base' as *;
+
+.search-result {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-2 $space-3;
+  border-radius: $radius-sm;
+  cursor: pointer;
+
+  &:hover,
+  &--active {
+    background: $color-surface-raised;
+  }
+
+  &--active {
+    outline: 1px solid $color-accent;
+  }
+
+  &__summary {
+    min-width: 0;
+    overflow: hidden;
+    color: $color-text;
+    font-size: $font-size-sm;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
