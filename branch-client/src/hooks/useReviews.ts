@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { fetchReviews, startReview } from '../services/reviews.ts'
-import type { Review, ReviewRole } from '../types/review.ts'
+import type { Review } from '../types/review.ts'
 
 const POLL_MS = 5_000
 
@@ -35,9 +35,9 @@ export function useReviews(ticketKey: string) {
   }, [ticketKey, active, refreshKey])
 
   const start = useCallback(
-    async (role: ReviewRole) => {
+    async () => {
       try {
-        const review = await startReview(ticketKey, role)
+        const review = await startReview(ticketKey)
         setReviews((current) => [...current, review])
         setError(undefined)
       } catch (cause) {

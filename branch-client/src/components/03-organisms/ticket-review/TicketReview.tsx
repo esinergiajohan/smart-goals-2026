@@ -2,14 +2,14 @@ import { useId, useState } from 'react'
 import { useReviews } from '../../../hooks/useReviews.ts'
 import type { RepositoryDraft } from '../../../services/repositories.ts'
 import type { TrackedTicket } from '../../../types/jira.ts'
-import type { Repository, ReviewRole } from '../../../types/review.ts'
-import { BRANCH_ROLE_LABELS, resolveBranches } from '../../../utils/branches.ts'
+import type { Repository } from '../../../types/review.ts'
+import { resolveBranches } from '../../../utils/branches.ts'
+import { testBranchFor } from '../../../utils/review.ts'
 import { Button } from '../../01-atoms/button/Button.tsx'
 import { RepositoryForm } from '../../02-molecules/repository-form/RepositoryForm.tsx'
 import { ReviewIteration } from '../../02-molecules/review-iteration/ReviewIteration.tsx'
 import './ticket-review.scss'
 
-const ROLES: ReviewRole[] = ['stg', 'dev']
 const ADD_REPOSITORY = 'add'
 
 interface TicketReviewProps {
@@ -24,9 +24,8 @@ export function TicketReview({ ticket, repositories, onRepositoryChange, onAddRe
   const selectId = useId()
   const [adding, setAdding] = useState(false)
   const { reviews, active, error, start } = useReviews(ticket.key)
-  const branches = resolveBranches(ticket)
+  const testBranch = testBranchFor(resolveBranches(ticket).work)
   const repository = repositories.find((item) => item.id === ticket.repositoryId)
-  const baseFor = (role: ReviewRole) => (role === 'stg' ? repository?.baseBranch : repository?.developmentBranch)
 
   const handleRepositoryChange = (value: string) => {
     if (value === ADD_REPOSITORY) {
@@ -71,23 +70,19 @@ export function TicketReview({ ticket, repositories, onRepositoryChange, onAddRe
       {adding && <RepositoryForm onSubmit={handleAddRepository} onCancel={() => setAdding(false)} />}
 
       {repository && !adding && (
-        <ul role="list" className="ticket-review__targets">
-          {ROLES.map((role) => (
-            <li key={role} className={`ticket-review__target ticket-review__target--${role}`}>
-              <span className="ticket-review__role">{BRANCH_ROLE_LABELS[role]}</span>
-              <code className="ticket-review__branch">
-                {branches[role]} → {baseFor(role)}
-              </code>
-              <Button
-                disabled={active}
-                aria-label={`Revisar ${branches[role]} hacia ${baseFor(role)}`}
-                onClick={() => start(role)}
-              >
-                Revisar
-              </Button>
-            </li>
-          ))}
-        </ul>
+        <div className="ticket-review__target">
+          <span className="ticket-review__role">TEST</span>
+          <code className="ticket-review__branch">
+            {testBranch} → {repository.productionBranch}
+          </code>
+          <Button
+            disabled={active}
+            aria-label={`Revisar ${testBranch} hacia ${repository.productionBranch}`}
+            onClick={() => start()}
+          >
+            Revisar
+          </Button>
+        </div>
       )}
 
       {error && (

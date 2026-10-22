@@ -1,7 +1,7 @@
 import { setTimeout as sleep } from 'node:timers/promises'
 import { parseArgs } from 'node:util'
 import type { JiraTicket, TicketBranches, TrackedTicket } from '../src/types/jira.ts'
-import type { Repository, Review, ReviewRole } from '../src/types/review.ts'
+import type { Repository, Review } from '../src/types/review.ts'
 
 const API = `http://127.0.0.1:${process.env.BRANCH_SERVER_PORT ?? 8787}/api`
 const POLL_MS = 10_000
@@ -21,7 +21,8 @@ Uso: bm <comando> [opciones] [--json]
                [--comment ID|none]
   card rm KEY
   reviews KEY                              Historial de revisiones de la card
-  review KEY --role stg|dev [--wait]       Revisión local con pr-review + Claude
+  review KEY [--wait]                      PR simulado: pr-review + Claude sobre <rama de trabajo>-test
+                                           contra la rama de producción del repo
 
 Códigos de salida de «review --wait»: 0 aprobado, 2 rechazado, 3 no concluyente, 1 error.
 La API debe estar arriba: npm run dev (o npm run server) en branch-client.`
@@ -214,10 +215,11 @@ const commands: Record<string, (args: string[]) => Promise<number | void>> = {
 
   async review([rawKey]) {
     const key = requireKey(rawKey)
-    const role = options.role as ReviewRole
-    if (role !== 'stg' && role !== 'dev') throw new CliError('Indica --role stg o --role dev.')
+    if (options.role !== undefined && options.role !== 'test') {
+      throw new CliError('pr-review solo se corre sobre la rama -test, no sobre -dev ni -stg.')
+    }
 
-    const { review } = await request<{ review: Review }>('/reviews', { method: 'POST', body: { ticketKey: key, role } })
+    const { review } = await request<{ review: Review }>('/reviews', { method: 'POST', body: { ticketKey: key } })
     if (!options.wait) return print(`Revisión #${review.id} en cola para ${review.branch} → ${review.base}.`, review)
 
     const finished = await waitForReview(key, review.id)

@@ -1,10 +1,11 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { asc, eq } from 'drizzle-orm'
 import type { TicketBranches } from '../src/types/jira.ts'
-import type { Review, ReviewRole } from '../src/types/review.ts'
+import type { Review } from '../src/types/review.ts'
+import { testBranchFor } from '../src/utils/review.ts'
 import type { Db } from './db/client.ts'
 import { repositories, reviews, tickets } from './db/schema.ts'
-import { findMergedBase, resolveRef } from './git-refs.ts'
+import { existingRefs, findMergedBase, resolveRef } from './git-refs.ts'
 import { HttpError, readJson, sendJson } from './http.ts'
 import { ISSUE_KEY } from './jira-api.ts'
 import { parseBranchName } from './repositories-api.ts'
@@ -12,8 +13,6 @@ import type { ReviewRunner } from './review-runner.ts'
 
 type ReviewRow = typeof reviews.$inferSelect
 
-const ROLES: ReviewRole[] = ['dev', 'stg']
-const DEFAULT_BRANCH_SUFFIX: Record<ReviewRole, string> = { dev: '-dev', stg: '-stg' }
 
 const toReview = (row: ReviewRow): Review =>
   Object.fromEntries(
@@ -28,8 +27,8 @@ const parseKey = (value: unknown) => {
   return key
 }
 
-const branchFor = (key: string, role: ReviewRole, branches: Partial<TicketBranches> | null) =>
-  branches?.[role]?.trim() || `feature/${key}${DEFAULT_BRANCH_SUFFIX[role]}`
+const testBranch = (key: string, branches: Partial<TicketBranches> | null) =>
+  testBranchFor(branches?.work?.trim() || `feature/${key}`)
 
 export const REVIEWS_ROUTE = '/api/reviews'
 
@@ -44,8 +43,9 @@ export const createReviewsHandler =
     if (req.method === 'POST') {
       const body = (await readJson(req)) as Record<string, unknown> | null
       const key = parseKey(body?.ticketKey)
-      const role = body?.role as ReviewRole
-      if (!ROLES.includes(role)) throw new HttpError(400, 'La revisión solo aplica a las ramas DEV o STG.')
+      if (body?.role !== undefined && body.role !== 'test') {
+        throw new HttpError(400, 'pr-review solo se corre sobre la rama -test, no sobre -dev ni -stg.')
+      }
 
       const ticket = db.select().from(tickets).where(eq(tickets.key, key)).get()
       if (!ticket) throw new HttpError(404, `La card ${key} no existe.`)
@@ -61,8 +61,14 @@ export const createReviewsHandler =
         .some((review) => review.status === 'queued' || review.status === 'running')
       if (running) throw new HttpError(409, `Ya hay una revisión en curso para ${key}.`)
 
-      const branch = await parseBranchName(repository.path, branchFor(key, role, ticket.branches), role)
-      const base = role === 'stg' ? repository.baseBranch : repository.developmentBranch
+      const branch = await parseBranchName(repository.path, testBranch(key, ticket.branches), 'test')
+      const base = repository.productionBranch
+      if (!(await existingRefs(repository.path, branch)).length) {
+        throw new HttpError(
+          400,
+          `No existe la rama «${branch}». Créala con el flujo validar-despliegue (cherry-pick de los commits de la rama de trabajo sobre origin/${base}) y vuelve a revisar.`,
+        )
+      }
       const mergedInto = await findMergedBase(repository.path, await resolveRef(repository.path, branch), base)
       if (mergedInto) {
         throw new HttpError(409, `La rama «${branch}» ya está mergeada en ${mergedInto}: no hay nada que revisar.`)
@@ -72,7 +78,7 @@ export const createReviewsHandler =
         .values({
           ticketKey: key,
           repositoryId: repository.id,
-          role,
+          role: 'test',
           branch,
           base,
           status: 'queued',

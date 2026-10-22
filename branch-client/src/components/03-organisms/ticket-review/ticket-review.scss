@@ -40,7 +40,6 @@
     }
   }
 
-  &__targets,
   &__history {
     display: flex;
     flex-direction: column;
@@ -58,17 +57,10 @@
   }
 
   &__role {
+    color: $color-branch-work;
     font-size: $font-size-xs;
     font-weight: $font-weight-bold;
     letter-spacing: 0.06em;
-  }
-
-  &__target--dev &__role {
-    color: $color-branch-dev;
-  }
-
-  &__target--stg &__role {
-    color: $color-branch-stg;
   }
 
   &__branch {

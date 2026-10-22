@@ -1,7 +1,6 @@
 import type { Review } from '../../../types/review.ts'
-import { BRANCH_ROLE_LABELS } from '../../../utils/branches.ts'
 import { classNames } from '../../../utils/classNames.ts'
-import { reviewTone } from '../../../utils/review.ts'
+import { REVIEW_ROLE_LABELS, reviewTone } from '../../../utils/review.ts'
 import { DateTime } from '../../01-atoms/date-time/DateTime.tsx'
 import './review-iteration.scss'
 
@@ -26,7 +25,7 @@ export function ReviewIteration({ review }: ReviewIterationProps) {
       <summary className="review-iteration__summary">
         <span className="review-iteration__label">
           {review.iteration && review.status !== 'failed' ? `Iteración ${review.iteration}` : 'Intento'} ·{' '}
-          {BRANCH_ROLE_LABELS[review.role]}
+          {REVIEW_ROLE_LABELS[review.role]}
         </span>
         <span className="review-iteration__verdict">{review.verdict ?? STATUS_LABELS[review.status]}</span>
         <span className="review-iteration__date">

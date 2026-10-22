@@ -1,4 +1,4 @@
-export type ReviewRole = 'dev' | 'stg'
+export type ReviewRole = 'test' | 'dev' | 'stg'
 
 export type ReviewStatus = 'queued' | 'running' | 'done' | 'failed'
 
