@@ -1,0 +1,96 @@
+@use '../../00-base' as *;
+
+.featured-comment {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    margin: 0;
+    color: $color-amber-300;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__form {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  &__input.input {
+    padding: $space-1 $space-2;
+    font-size: $font-size-sm;
+  }
+
+  &__form-error {
+    grid-column: 1 / -1;
+  }
+
+  &__error {
+    color: $color-danger;
+    font-size: $font-size-sm;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    padding: $space-3 $space-4;
+    border: 1px solid $color-amber-900;
+    border-left: 4px solid $color-amber-400;
+    border-radius: $radius-sm;
+    background: $color-amber-950;
+    font-size: $font-size-sm;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: $space-2 $space-3;
+    color: $color-text-muted;
+    font-size: $font-size-xs;
+  }
+
+  &__author {
+    color: $color-amber-300;
+    font-size: $font-size-sm;
+  }
+
+  &__text {
+    color: $color-text;
+    line-height: 1.45;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-2;
+
+    .button {
+      padding: $space-1 $space-2;
+      font-size: $font-size-xs;
+    }
+  }
+
+  &__link {
+    margin-right: auto;
+    color: $color-amber-300;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+}

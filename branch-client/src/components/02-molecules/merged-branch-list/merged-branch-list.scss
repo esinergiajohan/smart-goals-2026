@@ -1,0 +1,46 @@
+@use '../../00-base' as *;
+
+.merged-branch-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $space-2;
+  margin-left: $space-4;
+  padding-left: $space-4;
+  border-left: 2px solid $color-branch-release;
+
+  &__title {
+    color: $color-branch-release;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &__items {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  &__control.input {
+    padding: $space-1 $space-2;
+    font-family: $font-family-mono;
+    font-size: $font-size-sm;
+  }
+
+  &__add {
+    padding: $space-1 $space-3;
+    font-size: $font-size-xs;
+  }
+}

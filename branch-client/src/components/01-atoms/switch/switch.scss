@@ -1,0 +1,68 @@
+@use '../../00-base' as *;
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-1 0;
+  border: 0;
+  background: none;
+  color: $color-text-muted;
+  cursor: pointer;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $color-text;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: $radius-sm;
+  }
+
+  &__track {
+    display: inline-flex;
+    width: 2rem;
+    height: 1.125rem;
+    padding: 0.125rem;
+    border-radius: $radius-pill;
+    background: $color-border-strong;
+    transition: background-color $transition-base;
+  }
+
+  &__thumb {
+    width: 0.875rem;
+    height: 0.875rem;
+    border-radius: 50%;
+    background: $color-text;
+    transition: transform $transition-base;
+  }
+
+  &__label {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &--on {
+    color: $color-branch-release;
+  }
+
+  &--on &__track {
+    background: $color-branch-release;
+  }
+
+  &--on &__thumb {
+    transform: translateX(0.875rem);
+    background: $color-bg;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &,
+    &__track,
+    &__thumb {
+      transition: none;
+    }
+  }
+}

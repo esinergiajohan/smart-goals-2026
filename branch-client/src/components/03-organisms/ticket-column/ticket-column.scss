@@ -53,5 +53,10 @@
     border-radius: $radius-lg;
     color: $color-text-muted;
     text-align: center;
+
+    &--error {
+      border-color: $color-danger;
+      color: $color-danger;
+    }
   }
 }

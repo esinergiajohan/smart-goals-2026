@@ -1,11 +1,12 @@
-import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
-import { defineConfig, loadEnv } from 'vite'
-import { jiraApi } from './server/jira-api.ts'
+import { defineConfig } from 'vite'
 
-const rootEnvDir = fileURLToPath(new URL('..', import.meta.url))
+const API_TARGET = `http://127.0.0.1:${process.env.BRANCH_SERVER_PORT ?? 8787}`
 
 // https://vite.dev/config/
-export default defineConfig(({ mode }) => ({
-  plugins: [react(), jiraApi(loadEnv(mode, rootEnvDir, 'JIRA_'))],
-}))
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: { '/api': API_TARGET },
+  },
+})

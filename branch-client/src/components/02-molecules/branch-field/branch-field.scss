@@ -1,0 +1,44 @@
+@use '../../00-base' as *;
+
+.branch-field {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  align-items: center;
+  gap: $space-2;
+
+  &__label {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+
+    &::before {
+      content: '';
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background: currentColor;
+    }
+  }
+
+  &__control.input {
+    padding: $space-1 $space-2;
+    font-family: $font-family-mono;
+    font-size: $font-size-sm;
+  }
+
+  &--work &__label {
+    color: $color-branch-work;
+  }
+
+  &--dev &__label {
+    color: $color-branch-dev;
+  }
+
+  &--stg &__label {
+    color: $color-branch-stg;
+  }
+}

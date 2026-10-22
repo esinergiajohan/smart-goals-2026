@@ -1,0 +1,98 @@
+@use '../../00-base' as *;
+
+@keyframes active-ticket-card-alert {
+  50% {
+    background: $color-danger-solid-dim;
+  }
+}
+
+.active-ticket-card {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  padding: $space-3 $space-4;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  background: $color-surface;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-3;
+  }
+
+  &__title {
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-regular;
+    line-height: 1.4;
+  }
+
+  &__key {
+    color: $color-text;
+    font-family: $font-family-mono;
+    font-weight: $font-weight-bold;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-focus;
+      outline-offset: 2px;
+    }
+  }
+
+  &--urgent {
+    border-color: $color-danger-border;
+  }
+
+  &__comment {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    overflow: hidden;
+    border: 1px solid $color-danger-border;
+    border-radius: $radius-sm;
+    background: $color-danger-bg;
+    color: $color-text;
+    text-decoration: none;
+
+    &:hover {
+      border-color: $color-danger;
+    }
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+
+  &__author {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-1 $space-3;
+    background: $color-danger-solid;
+    color: #fff;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.04em;
+    animation: active-ticket-card-alert 1.6s ease-in-out infinite;
+  }
+
+  &__excerpt {
+    padding: 0 $space-3 $space-2;
+    color: $color-text;
+    font-size: $font-size-sm;
+    font-style: italic;
+    line-height: 1.4;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__author {
+      animation: none;
+    }
+  }
+}

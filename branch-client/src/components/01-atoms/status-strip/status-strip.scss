@@ -1,0 +1,44 @@
+@use '../../00-base' as *;
+
+.status-strip {
+  position: absolute;
+  inset: 0 auto 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $status-strip-width;
+  padding: $space-3 0;
+  background: $color-accent;
+  color: $color-bg;
+  writing-mode: vertical-lr;
+  transform: rotate(180deg);
+
+  &__label {
+    max-height: 100%;
+    overflow: hidden;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.2em;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  &--progress {
+    background: $color-amber-400;
+  }
+
+  &--blocked {
+    background: $color-danger-solid;
+    color: #fff;
+  }
+
+  &--done {
+    background: $color-emerald-400;
+  }
+
+  &--unknown {
+    background: $color-border-strong;
+    color: $color-text-muted;
+  }
+}

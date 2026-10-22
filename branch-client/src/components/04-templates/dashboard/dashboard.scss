@@ -25,5 +25,9 @@
     max-width: $container-content;
     margin-inline: auto;
     padding: $space-8 $space-4;
+
+    @media (min-width: $breakpoint-wide) {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(0, 0.75fr);
+    }
   }
 }

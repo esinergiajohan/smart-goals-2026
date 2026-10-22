@@ -4,7 +4,9 @@
   display: flex;
   flex-direction: column;
   gap: $space-3;
-  padding: $space-5 $space-6;
+  position: relative;
+  overflow: hidden;
+  padding: $space-5 $space-6 $space-5 calc(#{$status-strip-width} + #{$space-5});
   border: 1px solid $color-border;
   border-radius: $radius-lg;
   background: $color-surface;

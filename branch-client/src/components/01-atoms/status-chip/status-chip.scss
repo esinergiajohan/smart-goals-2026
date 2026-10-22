@@ -1,0 +1,33 @@
+@use '../../00-base' as *;
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  color: $color-text-muted;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &--open {
+    color: $color-accent;
+  }
+
+  &--progress {
+    color: $color-amber-400;
+  }
+
+  &--blocked {
+    color: $color-danger;
+  }
+}

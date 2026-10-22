@@ -1,22 +1,36 @@
 import { useEffect, useRef, useState } from 'react'
-import type { TrackedTicket } from '../../../types/jira.ts'
+import type { TicketBranches, TicketStatus, TrackedTicket } from '../../../types/jira.ts'
 import { classNames } from '../../../utils/classNames.ts'
 import { Badge } from '../../01-atoms/badge/Badge.tsx'
 import { Button } from '../../01-atoms/button/Button.tsx'
 import { DateTime } from '../../01-atoms/date-time/DateTime.tsx'
+import { StatusStrip } from '../../01-atoms/status-strip/StatusStrip.tsx'
 import { Toggle } from '../../01-atoms/toggle/Toggle.tsx'
 import { ConfirmDialog } from '../../02-molecules/confirm-dialog/ConfirmDialog.tsx'
 import { MetaItem } from '../../02-molecules/meta-item/MetaItem.tsx'
+import { FeaturedComment } from '../featured-comment/FeaturedComment.tsx'
+import { TicketBranches as TicketBranchesPanel } from '../ticket-branches/TicketBranches.tsx'
 import './ticket-card.scss'
 
 interface TicketCardProps {
   ticket: TrackedTicket
+  status?: TicketStatus
   focusToggle?: boolean
   onRemove: (key: string) => void
   onDeployChange: (key: string, deployed: boolean) => void
+  onBranchesChange: (key: string, branches: Partial<TicketBranches>) => void
+  onFeaturedCommentChange: (key: string, commentId: string | undefined) => void
 }
 
-export function TicketCard({ ticket, focusToggle = false, onRemove, onDeployChange }: TicketCardProps) {
+export function TicketCard({
+  ticket,
+  status,
+  focusToggle = false,
+  onRemove,
+  onDeployChange,
+  onBranchesChange,
+  onFeaturedCommentChange,
+}: TicketCardProps) {
   const titleId = `ticket-card-${ticket.key}-title`
   const deployed = Boolean(ticket.deployedAt)
   const [confirming, setConfirming] = useState(false)
@@ -28,6 +42,7 @@ export function TicketCard({ ticket, focusToggle = false, onRemove, onDeployChan
 
   return (
     <article className={classNames('ticket-card', deployed && 'ticket-card--deployed')} aria-labelledby={titleId}>
+      <StatusStrip status={status} />
       <header className="ticket-card__header">
         <Badge>{ticket.key}</Badge>
         <Button
@@ -52,6 +67,14 @@ export function TicketCard({ ticket, focusToggle = false, onRemove, onDeployChan
           <DateTime value={ticket.updated} />
         </MetaItem>
       </dl>
+
+      <FeaturedComment
+        ticketKey={ticket.key}
+        commentId={ticket.featuredCommentId}
+        onChange={(commentId) => onFeaturedCommentChange(ticket.key, commentId)}
+      />
+
+      <TicketBranchesPanel ticket={ticket} onChange={(branches) => onBranchesChange(ticket.key, branches)} />
 
       <footer className="ticket-card__footer">
         <Toggle

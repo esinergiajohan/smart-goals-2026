@@ -1,4 +1,16 @@
 .env
+.env.*
+!.env.example
 tasks.json
 node_modules
 publish-log.jsonl
+.DS_Store
+
+# SQLite (Branch Manager)
+/data/
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3

@@ -1,0 +1,146 @@
+@use '../../00-base' as *;
+
+$branch-roles: (
+  'work': $color-branch-work,
+  'merged': $color-branch-work,
+);
+
+@keyframes branch-graph-flow {
+  to {
+    stroke-dashoffset: -12;
+  }
+}
+
+@keyframes branch-graph-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.branch-graph {
+  margin: 0;
+  padding: $space-3;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  background: $color-bg;
+
+  &__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  &__box {
+    fill: $color-surface-raised;
+    stroke-width: 1.5;
+  }
+
+  &__role {
+    font-size: 9px;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__name {
+    fill: $color-text;
+    font-family: $font-family-mono;
+    font-size: 10px;
+
+    &--empty {
+      fill: $color-text-subtle;
+      font-family: $font-family-base;
+      font-style: italic;
+    }
+  }
+
+  &__edge {
+    fill: none;
+    stroke-width: 2;
+    stroke: $color-branch-work;
+    stroke-linecap: round;
+    stroke-dasharray: 4 4;
+    animation: branch-graph-flow 900ms linear infinite;
+  }
+
+  &__arrow {
+    fill: $color-branch-work;
+  }
+
+  &__hint {
+    fill: $color-text-subtle;
+    font-size: 10px;
+    font-style: italic;
+  }
+
+  &__release-frame {
+    stroke: $color-branch-release;
+    stroke-width: 1.5;
+  }
+
+  &__release-strip {
+    fill: $color-branch-release;
+  }
+
+  &__release-text {
+    fill: $color-bg;
+    font-size: 9px;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  &__legend {
+    display: flex;
+    justify-content: center;
+    gap: $space-4;
+    margin-top: $space-2;
+    color: $color-text-muted;
+    font-size: $font-size-xs;
+  }
+
+  &__legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+
+    &::before {
+      content: '';
+      width: 1.25rem;
+      border-top: 2px dashed currentColor;
+    }
+  }
+
+  @each $role, $color in $branch-roles {
+    &__node--#{$role} &__box {
+      stroke: $color;
+    }
+
+    &__node--#{$role} &__role,
+    &__node--#{$role} &__dot {
+      fill: $color;
+    }
+  }
+
+  &__node,
+  &__release {
+    animation: branch-graph-fade 300ms ease-out both;
+  }
+
+  &__release {
+    filter: drop-shadow(0 0 8px rgb(192 132 252 / 0.35));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__node,
+    &__release,
+    &__edge {
+      animation: none;
+    }
+  }
+}
