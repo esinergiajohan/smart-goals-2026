@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "concurrently -k -n web,api -c cyan,magenta \"vite\" \"npm:server\"",
     "server": "node --watch server/index.ts",
+    "bm": "node bin/bm.ts",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "concurrently -k -n web,api -c cyan,magenta \"vite preview\" \"npm:server\"",

@@ -30,6 +30,7 @@ const reviewRunner = createReviewRunner(db, {
   reviewsDir: process.env.BRANCH_REVIEWS_DIR ?? join(homedir(), '.branch-manager', 'reviews'),
   pythonBin: process.env.PR_REVIEW_PYTHON ?? 'python3',
   claudeBin: process.env.CLAUDE_BIN ?? 'claude',
+  claudeConfigDir: process.env.BRANCH_CLAUDE_CONFIG_DIR ?? process.env.CLAUDE_CONFIG_DIR,
   model: process.env.BRANCH_REVIEW_MODEL,
   jiraEnv: process.env,
 })

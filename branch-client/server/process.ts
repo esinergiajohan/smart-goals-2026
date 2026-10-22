@@ -9,18 +9,21 @@ export interface ProcessResult {
   stderr: string
 }
 
-export const safeEnv = (): NodeJS.ProcessEnv =>
-  Object.fromEntries(Object.entries(process.env).filter(([name]) => !SECRET_ENV.test(name)))
+export const safeEnv = (): NodeJS.ProcessEnv => ({
+  ...Object.fromEntries(Object.entries(process.env).filter(([name]) => !SECRET_ENV.test(name))),
+  NO_COLOR: '1',
+  PYTHON_COLORS: '0',
+})
 
 export const runProcess = (
   command: string,
   args: string[],
-  { cwd, timeoutMs }: { cwd: string; timeoutMs: number },
+  { cwd, timeoutMs, env }: { cwd: string; timeoutMs: number; env?: NodeJS.ProcessEnv },
 ): Promise<ProcessResult> =>
   new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd,
-      env: safeEnv(),
+      env: { ...safeEnv(), ...env },
       stdio: ['ignore', 'pipe', 'pipe'],
       timeout: timeoutMs,
       killSignal: 'SIGTERM',

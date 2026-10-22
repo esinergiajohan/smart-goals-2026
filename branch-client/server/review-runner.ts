@@ -14,6 +14,7 @@ export interface ReviewConfig {
   reviewsDir: string
   pythonBin: string
   claudeBin: string
+  claudeConfigDir?: string
   model?: string
   jiraEnv: JiraEnv
 }
@@ -50,6 +51,17 @@ const READ_ONLY_TOOLS = [
   'Bash(git rev-parse:*)',
 ]
 const SCHEMA_VERSION = '1.1'
+const KIT_SHIM = [
+  'import runpy, subprocess, sys',
+  '_run = subprocess.run',
+  'def run(*args, **kwargs):',
+  "    if kwargs.get('text') or kwargs.get('universal_newlines'):",
+  "        kwargs.setdefault('errors', 'replace')",
+  '    return _run(*args, **kwargs)',
+  'subprocess.run = run',
+  'sys.argv = sys.argv[1:]',
+  "runpy.run_path(sys.argv[0], run_name='__main__')",
+].join('\n')
 
 const now = () => new Date().toISOString()
 
@@ -165,6 +177,8 @@ export const createReviewRunner = (db: Db, config: ReviewConfig) => {
     }
 
     const kitArgs = [
+      '-c',
+      KIT_SHIM,
       paths.cli,
       mode,
       '--repo',
@@ -217,6 +231,7 @@ export const createReviewRunner = (db: Db, config: ReviewConfig) => {
     const claude = await runProcess(config.claudeBin, claudeArgs, {
       cwd: repository.path,
       timeoutMs: CLAUDE_TIMEOUT_MS,
+      env: config.claudeConfigDir ? { CLAUDE_CONFIG_DIR: config.claudeConfigDir } : undefined,
     })
 
     let output: ClaudeOutput
@@ -227,7 +242,12 @@ export const createReviewRunner = (db: Db, config: ReviewConfig) => {
     }
     const structured = output.structured_output
     if (output.is_error || !structured) {
-      throw new Error(`Claude no completó la revisión: ${tail(output.result ?? claude.stderr ?? '')}`)
+      const reason = tail(output.result ?? claude.stderr ?? '')
+      throw new Error(
+        /not logged in/i.test(reason)
+          ? `Claude no tiene sesión en la configuración que usa el servidor (${config.claudeConfigDir ?? '~/.claude'}). Define BRANCH_CLAUDE_CONFIG_DIR en el .env con la carpeta de tu cuenta (por ejemplo la de claude-trabajo) y reinicia el servidor.`
+          : `Claude no completó la revisión: ${reason}`,
+      )
     }
 
     const result: ReviewResult = { schema_version: SCHEMA_VERSION, ...structured.result }
@@ -239,6 +259,8 @@ export const createReviewRunner = (db: Db, config: ReviewConfig) => {
     const certify = await runProcess(
       config.pythonBin,
       [
+        '-c',
+        KIT_SHIM,
         paths.cli,
         'certify',
         '--repo',
