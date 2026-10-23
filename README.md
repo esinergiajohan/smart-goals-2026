@@ -90,16 +90,6 @@ La IA **planifica** el ticket, **revisa el PR antes que el líder** y el tablero
 
 <img src="branch-client/public/docs/readme/detalle.svg" width="100%" alt="Aprobados por proyecto y 3 entregas comparadas: 3 aclaraciones en septiembre, 0 en octubre"/>
 
-### 🤖 Uso de la IA
-
-<table>
-<tr>
-<td width="33%" valign="top" align="center"><h3>1 · Al iniciar</h3>Claude lee el ticket desde Jira y deja el <b>plan de abordaje</b>.<br/><br/><code>Capa 3</code></td>
-<td width="33%" valign="top" align="center"><h3>2 · Antes del PR</h3>pr-review y Claude <b>revisan la rama -test</b> y certifican.<br/><br/><code>Capa 3</code></td>
-<td width="33%" valign="top" align="center"><h3>3 · Después del PR</h3>Se mide si el líder lo <b>aprobó a la primera</b>.<br/><br/><code>Capa 2</code></td>
-</tr>
-</table>
-
 <details>
 <summary><b>Objetivos completos y observaciones</b></summary>
 <br/>
@@ -124,16 +114,7 @@ La IA **planifica** el ticket, **revisa el PR antes que el líder** y el tablero
 
 ### 🔁 Flujo
 
-```mermaid
-flowchart LR
-  A([Ticket en Jira]) --> C{{Plan<br/>Claude + pr-review}} --> D[Implementación] --> F{{Revisar -test<br/>pr-review + Claude}}
-  F -. ajustes .-> D
-  F --> G[PR a DEV y STG] --> H[Líder] --> I([Aprobado a la primera]) --> J[(Informe)]
-  classDef ia fill:#022c22,stroke:#34d399,color:#f4f4f5
-  classDef meta fill:#451a03,stroke:#fbbf24,color:#fcd34d
-  class C,F ia
-  class I,J meta
-```
+<img src="branch-client/public/docs/readme/flujo.svg" width="100%" alt="Ticket en Jira, plan con IA, implementación, revisión de la rama -test, PR, aprobado a la primera e informe"/>
 
 ### 🧩 Anatomía de la card
 
@@ -240,28 +221,14 @@ sequenceDiagram
 
 ### ⌨️ CLI para agentes de IA
 
-<table>
-<tr>
-<td width="50%" valign="top">
-
-| Comando | Qué hace |
-|---|---|
-| `bm plan CLAVE --wait` | Plan de abordaje |
-| `bm plan-publish CLAVE` | Publica el plan en Jira |
-| `bm review CLAVE --wait` | Revisa la rama `-test` |
-
-</td>
-<td width="50%" valign="top">
-
-| Comando | Qué hace |
-|---|---|
-| `bm prs CLAVE --sync` | PR del ticket y su resultado |
-| `bm metrics --sync --detail` | Métrica con cada PR |
-| `bm card add CLAVE` | Crea la card |
-
-</td>
-</tr>
-</table>
+| Comando | Qué hace | Objetivo |
+|---|---|:-:|
+| `bm plan CLAVE --wait` | Genera el plan de abordaje | `Capa 3` |
+| `bm plan-publish CLAVE` | Publica el plan en Jira | `Capa 3` |
+| `bm review CLAVE --wait` | Revisa la rama `-test` con pr-review | `Capa 3` |
+| `bm prs CLAVE --sync` | PR del ticket y su resultado | `Capa 2` |
+| `bm metrics --sync --detail` | Métrica con el detalle de cada PR | `Capa 2` |
+| `bm card add CLAVE` | Crea la card de un ticket | — |
 
 <br/>
 
@@ -271,18 +238,7 @@ sequenceDiagram
 
 ### 🏗️ Arquitectura
 
-```mermaid
-flowchart LR
-  UI[Tablero · Informe · Docs] --> API[API local]
-  CLI[CLI bm] --> API
-  API --> DB[(SQLite)]
-  API --> J[Jira]
-  API --> G[Bitbucket · GitHub]
-  API --> IA[Claude<br/>solo lectura]
-  API --> KIT[Kit pr-review]
-  classDef ia fill:#022c22,stroke:#34d399,color:#f4f4f5
-  class IA,KIT ia
-```
+<img src="branch-client/public/docs/readme/arquitectura.svg" width="100%" alt="El tablero y la CLI usan la API local, que conecta SQLite, Jira, Bitbucket, GitHub, Claude y el kit pr-review"/>
 
 <table>
 <tr>
