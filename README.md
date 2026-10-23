@@ -51,14 +51,7 @@ La IA **planifica** el ticket, **revisa el PR antes que el líder** y el tablero
 
 <br/>
 
-<table>
-<tr>
-<td align="center" width="25%"><h1>86,7 %</h1><sub>PR aprobados a la primera</sub></td>
-<td align="center" width="25%"><h1>−80 %</h1><sub>aclaraciones del líder</sub></td>
-<td align="center" width="25%"><h1>26 / 30</h1><sub>PR de octubre sin devolución</sub></td>
-<td align="center" width="25%"><h1>4</h1><sub>proyectos medidos</sub></td>
-</tr>
-</table>
+<img src="branch-client/public/docs/readme/kpis.svg" width="100%" alt="86,7 % aprobados a la primera, −80 % aclaraciones, 26 de 30 PR, 4 proyectos"/>
 
 <br/>
 
@@ -85,60 +78,23 @@ La IA **planifica** el ticket, **revisa el PR antes que el líder** y el tablero
 
 <table>
 <tr>
-<td width="50%" valign="top">
-
-### Capa 2 · Aprobados sin retrabajo
-
-```mermaid
-xychart-beta
-  x-axis ["★ Sept", "Oct"]
-  y-axis "%" 0 --> 100
-  bar [55.6, 86.7]
-  line [80, 80]
-```
-
-<sub>La línea es la meta del 80 %.</sub>
-
-</td>
-<td width="50%" valign="top">
-
-### Capa 3 · Aclaraciones por PR
-
-```mermaid
-xychart-beta
-  x-axis ["★ Sept", "Oct"]
-  y-axis "Aclaraciones" 0 --> 0.4
-  bar [0.33, 0.07]
-```
-
-<sub>De 0,33 a 0,07: −80 %.</sub>
-
-</td>
+<td width="50%"><img src="branch-client/public/docs/readme/capa-2.svg" width="100%" alt="Capa 2: 55,6 % en septiembre, 86,7 % en octubre, meta 80 %"/></td>
+<td width="50%"><img src="branch-client/public/docs/readme/capa-3.svg" width="100%" alt="Capa 3: 0,33 aclaraciones por PR en septiembre, 0,07 en octubre"/></td>
 </tr>
 <tr>
+<td valign="top"><img src="branch-client/public/docs/readme/proyectos.svg" width="100%" alt="Aprobados a la primera por proyecto"/></td>
 <td valign="top">
 
-#### Por proyecto
+#### 🆚 3 entregas comparadas
 
-| Proyecto | ★ Sept | Oct |
-|---|:-:|:-:|
-| **redsalud** | 🟩 2/2 | 🟩 **20/20** |
-| **unisabana** | 🟥 1/3 | 🟨 **4/6** |
-| **unbosque-portal** | 🟥 1/3 | 🟨 **2/4** |
-| **fogafin** | 🟩 1/1 | — |
-| **Total** | **55,6 %** | **86,7 %** |
+| ★ Septiembre | Octubre |
+|---|---|
+| 🟥 unbosque #110 · 1 aclaración | 🟩 redsalud #1994 · 0 |
+| 🟥 unbosque #120 · 1 aclaración | 🟩 redsalud #1992 · 0 |
+| 🟥 unisabana #409 · 1 aclaración | 🟩 redsalud #1981 · 0 |
+| **3 aclaraciones** | **0 aclaraciones** |
 
-</td>
-<td valign="top">
-
-#### 3 entregas comparadas
-
-| ★ Septiembre · sin pr-review | | Octubre · con pr-review | |
-|---|:-:|---|:-:|
-| unbosque #110 | 🟥 1 | redsalud #1994 | 🟩 0 |
-| unbosque #120 | 🟥 1 | redsalud #1992 | 🟩 0 |
-| unisabana #409 | 🟥 1 | redsalud #1981 | 🟩 0 |
-| **Aclaraciones** | **3** | | **0** |
+<sub>Septiembre sin pr-review · octubre con pr-review.</sub>
 
 </td>
 </tr>
@@ -323,14 +279,10 @@ sequenceDiagram
 
 # 🔧 Técnico
 
-<table>
-<tr>
-<td width="50%" valign="top">
-
 ### 🏗️ Arquitectura
 
 ```mermaid
-flowchart TB
+flowchart LR
   UI[Tablero · Informe · Docs] --> API[API local]
   CLI[CLI bm] --> API
   API --> DB[(SQLite)]
@@ -342,7 +294,8 @@ flowchart TB
   class IA,KIT ia
 ```
 
-</td>
+<table>
+<tr>
 <td width="50%" valign="top">
 
 ### 🚀 Instalación
@@ -355,7 +308,12 @@ npm run dev
 
 <sub>Tablero en <code>localhost:5173</code> · API en <code>127.0.0.1:8787</code></sub>
 
-| Variable (`.env` raíz) | Para qué |
+</td>
+<td width="50%" valign="top">
+
+### 🔑 Variables
+
+| `.env` de la raíz | Para qué |
 |---|---|
 | `JIRA_BASE_URL` `JIRA_EMAIL` `JIRA_API_TOKEN` | Jira |
 | `BRANCH_CLAUDE_CONFIG_DIR` | Cuenta de Claude |
