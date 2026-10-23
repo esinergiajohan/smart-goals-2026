@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react'
 import { useReport } from '../../../hooks/useReport.ts'
 import type { ReportDelivery, ReportPeriod } from '../../../types/report.ts'
 import { formatLongDate } from '../../../utils/formatDate.ts'
@@ -50,6 +51,41 @@ const downloadCsv = (months: ReportPeriod[]) => {
   URL.revokeObjectURL(link.href)
 }
 
+const PDF_MARGIN = 28
+const PDF_SCALE = 2
+const EXPORT_WIDTH = 1100
+
+const nextFrame = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+
+const downloadPdf = async (root: HTMLElement) => {
+  const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import('html2canvas-pro'), import('jspdf')])
+  const canvas = await html2canvas(root, { scale: PDF_SCALE, backgroundColor: '#ffffff', windowWidth: EXPORT_WIDTH })
+  const top = root.getBoundingClientRect().top
+  const breaks = [...root.querySelectorAll('section, figure, tr, h2, h3, li, p, .report__tile')]
+    .map((element) => Math.round((element.getBoundingClientRect().bottom - top) * PDF_SCALE))
+    .filter((y) => y > 0)
+    .sort((a, b) => a - b)
+
+  const pdf = new jsPDF({ unit: 'pt', format: 'a4' })
+  const width = pdf.internal.pageSize.getWidth() - PDF_MARGIN * 2
+  const ratio = width / canvas.width
+  const pageHeight = Math.floor((pdf.internal.pageSize.getHeight() - PDF_MARGIN * 2) / ratio)
+
+  let start = 0
+  while (start < canvas.height) {
+    const limit = start + pageHeight
+    const end = limit >= canvas.height ? canvas.height : (breaks.filter((y) => y > start && y <= limit).at(-1) ?? limit)
+    const slice = document.createElement('canvas')
+    slice.width = canvas.width
+    slice.height = end - start
+    slice.getContext('2d')?.drawImage(canvas, 0, start, canvas.width, slice.height, 0, 0, canvas.width, slice.height)
+    if (start > 0) pdf.addPage()
+    pdf.addImage(slice.toDataURL('image/jpeg', 0.92), 'JPEG', PDF_MARGIN, PDF_MARGIN, width, slice.height * ratio)
+    start = end
+  }
+  pdf.save('informe-objetivos-2026.pdf')
+}
+
 function Result({ item }: { item: ReportDelivery }) {
   if (item.firstAttempt === true) return <span className="report__badge report__badge--good">✓ A la primera</span>
   if (item.firstAttempt === null) return <span className="report__badge">Abierto</span>
@@ -100,6 +136,23 @@ function DeliveryTable({ caption, items }: { caption: string; items: ReportDeliv
 
 export function ReportPage() {
   const { months, goal, usage, error } = useReport()
+  const rootRef = useRef<HTMLDivElement>(null)
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState<string>()
+
+  const handlePdf = async () => {
+    if (!rootRef.current) return
+    setExporting(true)
+    setExportError(undefined)
+    await nextFrame()
+    try {
+      await downloadPdf(rootRef.current)
+    } catch (cause) {
+      setExportError(cause instanceof Error ? cause.message : 'No se pudo generar el PDF')
+    } finally {
+      setExporting(false)
+    }
+  }
   const [baseline] = months
   const ready = Boolean(baseline && goal && usage)
 
@@ -119,7 +172,7 @@ export function ReportPage() {
     .slice(0, 3)
 
   return (
-    <div className="report">
+    <div ref={rootRef} className={exporting ? 'report report--export' : 'report'}>
       <header className="report__header">
         <div>
           <p className="report__eyebrow">esinergia S.A.S. · Johan Riascos</p>
@@ -127,8 +180,13 @@ export function ReportPage() {
           <p className="report__meta">Generado el {formatLongDate(new Date().toISOString())} desde Branch Manager</p>
         </div>
         <nav className="report__actions" aria-label="Acciones del informe">
-          <button type="button" className="report__button report__button--primary" onClick={() => window.print()}>
-            Descargar PDF
+          <button
+            type="button"
+            className="report__button report__button--primary"
+            onClick={handlePdf}
+            disabled={!ready || exporting}
+          >
+            {exporting ? 'Generando PDF…' : 'Descargar PDF'}
           </button>
           <button type="button" className="report__button" onClick={() => downloadCsv(months)} disabled={!ready}>
             Descargar CSV
@@ -139,9 +197,9 @@ export function ReportPage() {
         </nav>
       </header>
 
-      {error && (
+      {(error || exportError) && (
         <p role="alert" className="report__error">
-          {error}
+          {error ?? exportError}
         </p>
       )}
       {!ready && !error && <p role="status">Generando el informe…</p>}

@@ -1,5 +1,17 @@
 @use '../../00-base' as *;
 
+@mixin light-report {
+  --report-ink: #111;
+  --report-muted: #4b5563;
+  --report-border: #d1d5db;
+  --report-surface: #f9fafb;
+  --report-series: #3730a3;
+  --report-good: #047857;
+  --report-bad: #b91c1c;
+  --report-baseline: #b45309;
+  --report-target: #047857;
+}
+
 .report {
   --report-ink: #{$color-text};
   --report-muted: #{$color-text-muted};
@@ -15,6 +27,23 @@
   margin-inline: auto;
   padding: $space-8 $space-4;
   color: var(--report-ink);
+
+  &--export {
+    @include light-report;
+
+    width: 1100px;
+    max-width: none;
+    background: #fff;
+  }
+
+  &--export &__actions {
+    display: none;
+  }
+
+  &--export &__highlight-count,
+  &--export &__highlight-title {
+    color: var(--report-good);
+  }
 
   &__header {
     display: flex;
@@ -264,15 +293,7 @@
   }
 
   .report {
-    --report-ink: #111;
-    --report-muted: #4b5563;
-    --report-border: #d1d5db;
-    --report-surface: #f9fafb;
-    --report-series: #3730a3;
-    --report-good: #047857;
-    --report-bad: #b91c1c;
-    --report-baseline: #b45309;
-    --report-target: #047857;
+    @include light-report;
 
     max-width: none;
     padding: 0;
