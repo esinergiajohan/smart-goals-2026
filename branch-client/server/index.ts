@@ -7,6 +7,12 @@ import { CARDS_ROUTE, createCardsHandler } from './cards-api.ts'
 import { openDatabase } from './db/client.ts'
 import { HttpError, sendJson } from './http.ts'
 import { createJiraRoutes } from './jira-api.ts'
+import {
+  createPullRequestsHandlers,
+  METRICS_ROUTE,
+  PULL_REQUESTS_ROUTE,
+  PULL_REQUESTS_SYNC_ROUTE,
+} from './pull-requests-api.ts'
 import { createRepositoriesHandler, REPOSITORIES_ROUTE } from './repositories-api.ts'
 import { createReviewRunner } from './review-runner.ts'
 import { createReviewsHandler, REVIEWS_ROUTE } from './reviews-api.ts'
@@ -35,6 +41,9 @@ const reviewRunner = createReviewRunner(db, {
   jiraEnv: process.env,
 })
 const reviewsHandler = createReviewsHandler(db, reviewRunner)
+const pullRequestsHandlers = createPullRequestsHandlers(db, {
+  bitbucketEnvFile: process.env.BITBUCKET_ENV_FILE ?? '/Volumes/KINGSTON/7777/gitHub/bitbucket-mvp/.env',
+})
 
 const isLocalHost = (host: string | undefined) => {
   try {
@@ -57,6 +66,9 @@ const server = createServer(async (req, res) => {
     if (pathname === CARDS_ROUTE || pathname.startsWith(`${CARDS_ROUTE}/`)) return await cardsHandler(req, res, pathname)
     if (pathname === REPOSITORIES_ROUTE) return await repositoriesHandler(req, res)
     if (pathname === REVIEWS_ROUTE) return await reviewsHandler(req, res)
+    if (pathname === PULL_REQUESTS_ROUTE) return await pullRequestsHandlers.pullRequests(req, res)
+    if (pathname === PULL_REQUESTS_SYNC_ROUTE) return await pullRequestsHandlers.sync(req, res)
+    if (pathname === METRICS_ROUTE) return await pullRequestsHandlers.metrics(req, res)
 
     throw new HttpError(404, 'Ruta no encontrada.')
   } catch (error) {

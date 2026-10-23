@@ -4,7 +4,7 @@ import type { RepositoryDraft } from '../../../services/repositories.ts'
 import type { TrackedTicket } from '../../../types/jira.ts'
 import type { Repository } from '../../../types/review.ts'
 import { resolveBranches } from '../../../utils/branches.ts'
-import { testBranchFor } from '../../../utils/review.ts'
+import { reviewTarget } from '../../../utils/review.ts'
 import { Button } from '../../01-atoms/button/Button.tsx'
 import { RepositoryForm } from '../../02-molecules/repository-form/RepositoryForm.tsx'
 import { ReviewIteration } from '../../02-molecules/review-iteration/ReviewIteration.tsx'
@@ -24,8 +24,8 @@ export function TicketReview({ ticket, repositories, onRepositoryChange, onAddRe
   const selectId = useId()
   const [adding, setAdding] = useState(false)
   const { reviews, active, error, start } = useReviews(ticket.key)
-  const testBranch = testBranchFor(resolveBranches(ticket).work)
   const repository = repositories.find((item) => item.id === ticket.repositoryId)
+  const target = repository && reviewTarget(resolveBranches(ticket), repository.productionBranch)
 
   const handleRepositoryChange = (value: string) => {
     if (value === ADD_REPOSITORY) {
@@ -69,15 +69,15 @@ export function TicketReview({ ticket, repositories, onRepositoryChange, onAddRe
 
       {adding && <RepositoryForm onSubmit={handleAddRepository} onCancel={() => setAdding(false)} />}
 
-      {repository && !adding && (
+      {target && !adding && (
         <div className="ticket-review__target">
           <span className="ticket-review__role">TEST</span>
           <code className="ticket-review__branch">
-            {testBranch} → {repository.productionBranch}
+            {target.branch} → {target.base}
           </code>
           <Button
             disabled={active}
-            aria-label={`Revisar ${testBranch} hacia ${repository.productionBranch}`}
+            aria-label={`Revisar ${target.branch} hacia ${target.base}`}
             onClick={() => start()}
           >
             Revisar

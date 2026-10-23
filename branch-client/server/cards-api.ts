@@ -13,7 +13,7 @@ const MAX_BRANCH_LENGTH = 250
 const MAX_MERGED_BRANCHES = 50
 const MAX_IMPORTED_CARDS = 500
 const COMMENT_ID = /^\d+$/
-const BRANCH_ROLES = ['work', 'dev', 'stg'] as const
+const BRANCH_ROLES = ['work', 'dev', 'stg', 'test', 'testBase'] as const
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)

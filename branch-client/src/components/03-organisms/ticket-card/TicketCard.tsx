@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { usePullRequests } from '../../../hooks/usePullRequests.ts'
 import type { RepositoryDraft } from '../../../services/repositories.ts'
 import type { TicketBranches, TicketStatus, TrackedTicket } from '../../../types/jira.ts'
 import type { Repository } from '../../../types/review.ts'
@@ -9,6 +10,7 @@ import { DateTime } from '../../01-atoms/date-time/DateTime.tsx'
 import { StatusStrip } from '../../01-atoms/status-strip/StatusStrip.tsx'
 import { Toggle } from '../../01-atoms/toggle/Toggle.tsx'
 import { ConfirmDialog } from '../../02-molecules/confirm-dialog/ConfirmDialog.tsx'
+import { DeliveryBadges } from '../../02-molecules/delivery-badges/DeliveryBadges.tsx'
 import { MetaItem } from '../../02-molecules/meta-item/MetaItem.tsx'
 import { FeaturedComment } from '../featured-comment/FeaturedComment.tsx'
 import { TicketBranches as TicketBranchesPanel } from '../ticket-branches/TicketBranches.tsx'
@@ -44,6 +46,7 @@ export function TicketCard({
   const deployed = Boolean(ticket.deployedAt)
   const [confirming, setConfirming] = useState(false)
   const toggleRef = useRef<HTMLButtonElement>(null)
+  const pullRequests = usePullRequests(ticket.key, Boolean(ticket.repositoryId))
 
   useEffect(() => {
     if (focusToggle) toggleRef.current?.focus()
@@ -84,6 +87,8 @@ export function TicketCard({
       />
 
       <TicketBranchesPanel ticket={ticket} onChange={(branches) => onBranchesChange(ticket.key, branches)} />
+
+      <DeliveryBadges deliveries={pullRequests.deliveries} error={pullRequests.error} />
 
       <TicketReview
         ticket={ticket}

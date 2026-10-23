@@ -36,6 +36,8 @@ export interface TicketBranches {
   stg: string
   merged: string[]
   hasRelease: boolean
+  test?: string
+  testBase?: string
 }
 
 export interface TicketStatus {

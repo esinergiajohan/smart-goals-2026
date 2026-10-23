@@ -1,0 +1,37 @@
+export type PullRequestState = 'OPEN' | 'MERGED' | 'DECLINED' | 'SUPERSEDED'
+
+export interface PullRequest {
+  id: number
+  repositoryId: number
+  externalId: number
+  ticketKey?: string
+  title: string
+  sourceBranch: string
+  destinationBranch: string
+  state: PullRequestState
+  url: string
+  authorId: string
+  createdAt: string
+  closedAt?: string
+  approvedBy: string[]
+  changesRequested: number
+  pushesAfterOpen: number
+}
+
+export interface Delivery {
+  ticketKey: string
+  destinationBranch: string
+  pullRequests: PullRequest[]
+  firstAttempt: boolean | null
+  reworks: number
+  openedAt: string
+}
+
+export interface DeliveryMetrics {
+  from: string
+  to: string
+  deliveries: number
+  closed: number
+  firstAttempt: number
+  rate: number | null
+}

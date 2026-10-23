@@ -4,6 +4,11 @@ export const REVIEW_ROLE_LABELS: Record<ReviewRole, string> = { test: 'TEST', de
 
 export const testBranchFor = (workBranch: string) => `${workBranch}-test`
 
+export const reviewTarget = (branches: { work: string; test?: string; testBase?: string }, productionBranch: string) => ({
+  branch: branches.test?.trim() || testBranchFor(branches.work),
+  base: branches.testBase?.trim() || productionBranch,
+})
+
 export type ReviewTone = 'approved' | 'rejected' | 'inconclusive' | 'pending' | 'failed'
 
 export const reviewTone = (review: Review): ReviewTone => {

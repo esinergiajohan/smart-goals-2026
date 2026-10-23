@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { DashboardTemplate } from './components/04-templates/dashboard/DashboardTemplate.tsx'
+import { DeliveryMetrics } from './components/03-organisms/delivery-metrics/DeliveryMetrics.tsx'
 import { ActiveTicketColumn } from './components/03-organisms/active-ticket-column/ActiveTicketColumn.tsx'
 import { TicketColumn } from './components/03-organisms/ticket-column/TicketColumn.tsx'
 import { TicketSearch } from './components/03-organisms/ticket-search/TicketSearch.tsx'
@@ -31,7 +32,11 @@ function App() {
   }
 
   return (
-    <DashboardTemplate title="Jira Smart Project" search={<TicketSearch onSelect={addCard} />}>
+    <DashboardTemplate
+      title="Jira Smart Project"
+      search={<TicketSearch onSelect={addCard} />}
+      summary={<DeliveryMetrics />}
+    >
       <TicketColumn
         title="Pendientes de despliegue"
         tone="pending"

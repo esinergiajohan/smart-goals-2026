@@ -17,6 +17,12 @@
     margin-inline: auto;
   }
 
+  &__summary {
+    max-width: $container-content;
+    margin-inline: auto;
+    padding: $space-6 $space-4 0;
+  }
+
   &__content {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, #{$column-min-width}), 1fr));

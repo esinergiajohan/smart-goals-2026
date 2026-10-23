@@ -1,0 +1,75 @@
+@use '../../00-base' as *;
+
+.delivery-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-3 $space-6;
+  padding: $space-3 $space-4;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  background: $color-surface;
+
+  &__title {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    margin: 0;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__target {
+    color: $color-text-muted;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__periods {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-3 $space-6;
+    margin: 0;
+  }
+
+  &__period {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  &__label {
+    color: $color-text-muted;
+    font-size: $font-size-xs;
+  }
+
+  &__value {
+    display: flex;
+    align-items: baseline;
+    gap: $space-2;
+    margin: 0;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+
+    &--reached {
+      color: $color-emerald-400;
+    }
+
+    &--below {
+      color: $color-amber-400;
+    }
+  }
+
+  &__detail {
+    color: $color-text-muted;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-regular;
+  }
+
+  &__error {
+    flex-basis: 100%;
+    color: $color-danger;
+    font-size: $font-size-sm;
+  }
+}

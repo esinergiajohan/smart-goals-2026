@@ -1,7 +1,9 @@
 import { setTimeout as sleep } from 'node:timers/promises'
 import { parseArgs } from 'node:util'
 import type { JiraTicket, TicketBranches, TrackedTicket } from '../src/types/jira.ts'
+import type { Delivery, DeliveryMetrics } from '../src/types/pullRequest.ts'
 import type { Repository, Review } from '../src/types/review.ts'
+import { BASELINE_PERIOD, FIRST_ATTEMPT_TARGET, formatRate, GOAL_PERIOD } from '../src/utils/goals.ts'
 
 const API = `http://127.0.0.1:${process.env.BRANCH_SERVER_PORT ?? 8787}/api`
 const POLL_MS = 10_000
@@ -17,12 +19,17 @@ Uso: bm <comando> [opciones] [--json]
   cards                                    Lista las cards
   card add KEY                             Crea la card leyendo el ticket desde Jira
   card set KEY [--repo NOMBRE|ID|none] [--work R] [--dev R] [--stg R]
+               [--test R] [--test-base R]   (por defecto <work>-test contra producción)
                [--release true|false] [--merged r1,r2] [--deployed true|false]
                [--comment ID|none]
   card rm KEY
   reviews KEY                              Historial de revisiones de la card
   review KEY [--wait]                      PR simulado: pr-review + Claude sobre <rama de trabajo>-test
                                            contra la rama de producción del repo
+
+  prs KEY [--sync]                         PR de la card y si cada entrega salió al primer intento
+  metrics [--sync] [--from AAAA-MM-DD --to AAAA-MM-DD]
+                                           PR aprobados sin retrabajo (por defecto línea base y meta)
 
 Códigos de salida de «review --wait»: 0 aprobado, 2 rechazado, 3 no concluyente, 1 error.
 La API debe estar arriba: npm run dev (o npm run server) en branch-client.`
@@ -32,6 +39,9 @@ const { values: options, positionals } = parseArgs({
   options: {
     json: { type: 'boolean' },
     wait: { type: 'boolean' },
+    sync: { type: 'boolean' },
+    from: { type: 'string' },
+    to: { type: 'string' },
     help: { type: 'boolean', short: 'h' },
     role: { type: 'string' },
     name: { type: 'string' },
@@ -42,6 +52,8 @@ const { values: options, positionals } = parseArgs({
     repo: { type: 'string' },
     work: { type: 'string' },
     stg: { type: 'string' },
+    test: { type: 'string' },
+    'test-base': { type: 'string' },
     release: { type: 'string' },
     merged: { type: 'string' },
     deployed: { type: 'string' },
@@ -119,6 +131,17 @@ const waitForReview = async (key: string, id: number) => {
   }
 }
 
+const describeDelivery = (delivery: Delivery) => {
+  const status =
+    delivery.firstAttempt === true
+      ? 'aprobado al primer intento'
+      : delivery.firstAttempt === null
+        ? 'abierto, sin correcciones'
+        : `requirió ${delivery.reworks} corrección(es)`
+  const pullRequests = delivery.pullRequests.map((item) => `#${item.externalId} ${item.state}`).join(', ')
+  return `${delivery.ticketKey} → ${delivery.destinationBranch}: ${status} (${pullRequests})`
+}
+
 const commands: Record<string, (args: string[]) => Promise<number | void>> = {
   async health() {
     const { repositories } = await request<{ repositories: Repository[] }>('/repositories')
@@ -183,6 +206,8 @@ const commands: Record<string, (args: string[]) => Promise<number | void>> = {
       if (options.work !== undefined) branches.work = options.work
       if (options.dev !== undefined) branches.dev = options.dev
       if (options.stg !== undefined) branches.stg = options.stg
+      if (options.test !== undefined) branches.test = options.test
+      if (options['test-base'] !== undefined) branches.testBase = options['test-base']
       if (options.release !== undefined) branches.hasRelease = parseBoolean(options.release, 'release')
       if (options.merged !== undefined) branches.merged = options.merged.split(',').map((item) => item.trim()).filter(Boolean)
 
@@ -205,6 +230,46 @@ const commands: Record<string, (args: string[]) => Promise<number | void>> = {
     }
 
     throw new CliError('Uso: bm card add|set|rm KEY')
+  },
+
+  async prs([rawKey]) {
+    const key = requireKey(rawKey)
+    const data = options.sync
+      ? await request<{ deliveries: Delivery[] }>('/pull-requests/sync', { method: 'POST', body: { ticketKey: key } })
+      : await request<{ deliveries: Delivery[] }>(`/pull-requests?${new URLSearchParams({ ticket: key })}`)
+    print(data.deliveries.map(describeDelivery).join('\n') || `No hay PR registrados para ${key}.`, data.deliveries)
+  },
+
+  async metrics() {
+    const periods =
+      options.from && options.to
+        ? [{ label: `${options.from} → ${options.to}`, from: options.from, to: options.to }]
+        : [BASELINE_PERIOD, GOAL_PERIOD]
+    if (options.sync) {
+      for (const period of periods) {
+        await request('/pull-requests/sync', { method: 'POST', body: { from: period.from, to: period.to } })
+      }
+    }
+    const results = await Promise.all(
+      periods.map(async (period) => ({
+        period,
+        metrics: (
+          await request<{ metrics: DeliveryMetrics }>(
+            `/metrics?${new URLSearchParams({ from: period.from, to: period.to })}`,
+          )
+        ).metrics,
+      })),
+    )
+    print(
+      [
+        `PR aprobados sin retrabajo (meta ${formatRate(FIRST_ATTEMPT_TARGET)}):`,
+        ...results.map(
+          ({ period, metrics }) =>
+            `  ${period.label}: ${formatRate(metrics.rate)} (${metrics.firstAttempt} de ${metrics.closed} entregas)`,
+        ),
+      ].join('\n'),
+      results,
+    )
   },
 
   async reviews([rawKey]) {

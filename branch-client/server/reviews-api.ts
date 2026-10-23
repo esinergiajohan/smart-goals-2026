@@ -1,8 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { asc, eq } from 'drizzle-orm'
-import type { TicketBranches } from '../src/types/jira.ts'
 import type { Review } from '../src/types/review.ts'
-import { testBranchFor } from '../src/utils/review.ts'
+import { reviewTarget } from '../src/utils/review.ts'
 import type { Db } from './db/client.ts'
 import { repositories, reviews, tickets } from './db/schema.ts'
 import { existingRefs, findMergedBase, resolveRef } from './git-refs.ts'
@@ -27,8 +26,6 @@ const parseKey = (value: unknown) => {
   return key
 }
 
-const testBranch = (key: string, branches: Partial<TicketBranches> | null) =>
-  testBranchFor(branches?.work?.trim() || `feature/${key}`)
 
 export const REVIEWS_ROUTE = '/api/reviews'
 
@@ -61,8 +58,12 @@ export const createReviewsHandler =
         .some((review) => review.status === 'queued' || review.status === 'running')
       if (running) throw new HttpError(409, `Ya hay una revisión en curso para ${key}.`)
 
-      const branch = await parseBranchName(repository.path, testBranch(key, ticket.branches), 'test')
-      const base = repository.productionBranch
+      const target = reviewTarget(
+        { ...ticket.branches, work: ticket.branches?.work?.trim() || `feature/${key}` },
+        repository.productionBranch,
+      )
+      const branch = await parseBranchName(repository.path, target.branch, 'test')
+      const base = await parseBranchName(repository.path, target.base, 'base de la -test')
       if (!(await existingRefs(repository.path, branch)).length) {
         throw new HttpError(
           400,
