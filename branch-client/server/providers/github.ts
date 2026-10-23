@@ -1,6 +1,6 @@
 import type { PullRequestState } from '../../src/types/pullRequest.ts'
 import { runProcess } from '../process.ts'
-import type { GitProvider, PullRequestQuery, RemotePullRequest } from './types.ts'
+import { AUTHOR_PATTERN, type GitProvider, type PullRequestQuery, type RemotePullRequest } from './types.ts'
 
 const REMOTE = /github\.com[:/]([^/]+)\/([^/]+?)(?:\.git)?\/?$/
 const GH_TIMEOUT_MS = 60_000
@@ -41,7 +41,9 @@ interface GitHubEvent {
 }
 
 interface GitHubCommit {
-  commit: { committer: { date: string } | null }
+  author: GitHubUser | null
+  parents: unknown[]
+  commit: { committer: { date: string } | null; author: { name: string } | null }
 }
 
 export const githubRepository = (remoteUrl: string) => {
@@ -108,12 +110,20 @@ export const createGitHubProvider = (remoteUrl: string): GitProvider => {
       pages<GitHubCommit>(`${base}/pulls/${number}/commits?per_page=100`),
     ])
     const author = pull.user.login
+    const events = await pages<GitHubEvent>(`${base}/issues/${number}/events?per_page=100`)
     const closer =
-      stateOf(pull) === 'DECLINED'
-        ? (await pages<GitHubEvent>(`${base}/issues/${number}/events?per_page=100`))
-            .filter((event) => event.event === 'closed')
-            .at(-1)?.actor?.login
-        : undefined
+      stateOf(pull) === 'DECLINED' ? events.filter((event) => event.event === 'closed').at(-1)?.actor?.login : undefined
+    const reviewers = new Set(
+      [
+        ...reviews.map((review) => review.user?.login),
+        ...issueComments.map((comment) => comment.user?.login),
+        ...reviewComments.map((comment) => comment.user?.login),
+        pull.merged_by?.login,
+      ].filter((login): login is string => Boolean(login) && login !== author && !AUTHOR_PATTERN.test(login ?? '')),
+    )
+    const byReviewerCommit = (item: GitHubCommit) =>
+      item.parents.length === 1 &&
+      [item.author?.login, item.commit.author?.name].some((name) => name && reviewers.has(name))
     const byReviewer = (user: GitHubUser | null) => Boolean(user && user.login !== author && !BOT.test(user.login))
 
     return {
@@ -139,6 +149,10 @@ export const createGitHubProvider = (remoteUrl: string): GitProvider => {
         reviewComments.filter((comment) => byReviewer(comment.user)).length,
       ...(pull.merged_by && { mergedBy: pull.merged_by.login }),
       ...(closer && { closedBy: closer }),
+      reviewerCommits:
+        commits.filter(byReviewerCommit).length +
+        events.filter((event) => event.event === 'head_ref_force_pushed' && event.actor && reviewers.has(event.actor.login))
+          .length,
     }
   }
 

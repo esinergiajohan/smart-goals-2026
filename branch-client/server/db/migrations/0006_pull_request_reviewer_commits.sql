@@ -1,0 +1,1 @@
+ALTER TABLE `pull_requests` ADD `reviewer_commits` integer DEFAULT 0 NOT NULL;

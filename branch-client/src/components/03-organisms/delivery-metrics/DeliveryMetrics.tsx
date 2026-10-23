@@ -14,7 +14,7 @@ export function DeliveryMetrics() {
   return (
     <section className="delivery-metrics" aria-labelledby={headingId} aria-busy={syncing}>
       <h2 id={headingId} className="delivery-metrics__title">
-        PR aprobados sin retrabajo
+        PR aprobados sin devolución
         <span className="delivery-metrics__target">Meta {formatRate(FIRST_ATTEMPT_TARGET)}</span>
       </h2>
 
@@ -35,7 +35,7 @@ export function DeliveryMetrics() {
                   <>
                     {formatRate(metric.rate)}
                     <span className="delivery-metrics__detail">
-                      {metric.firstAttempt} de {metric.closed} entregas
+                      {metric.firstAttempt} de {metric.closed} PR · {metric.reviewerComments} aclaraciones
                     </span>
                   </>
                 ) : (
@@ -48,8 +48,8 @@ export function DeliveryMetrics() {
       </dl>
 
       <p className="delivery-metrics__note">
-        Una entrega es un ticket hacia staging o develop. Es primer intento si se resolvió con un solo PR, sin
-        «Request changes» ni pushes después de abrirlo. No cuentan los PR que cerraste tú sin revisión.
+        Cada PR tuyo hacia staging o develop. Cuenta como devuelto si tuvo «Request changes», comentarios o commits del
+        revisor, o si el revisor lo declinó. No cuentan los PR que cerraste tú sin revisión.
       </p>
 
       <Button onClick={sync} disabled={syncing}>

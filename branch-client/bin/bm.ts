@@ -139,10 +139,10 @@ const waitForReview = async (key: string, id: number) => {
 const describeDelivery = (delivery: Delivery) => {
   const status =
     delivery.firstAttempt === true
-      ? 'aprobado al primer intento'
+      ? 'aprobado sin devolución'
       : delivery.firstAttempt === null
-        ? 'abierto, sin correcciones'
-        : `requirió ${delivery.reworks} corrección(es)`
+        ? 'abierto, sin devoluciones'
+        : `devuelto (${delivery.reworks})`
   const pullRequests = delivery.pullRequests.map((item) => `#${item.externalId} ${item.state}`).join(', ')
   return `${delivery.ticketKey} → ${delivery.destinationBranch}: ${status} (${pullRequests})`
 }
@@ -336,12 +336,12 @@ const commands: Record<string, (args: string[]) => Promise<number | void>> = {
     )
     const line = (item: DeliveryDetail) =>
       `    ${item.firstAttempt === true ? '✓' : item.firstAttempt === null ? '·' : '✗'} ${item.repository} ${item.ticketKey} → ${item.destinationBranch}` +
-      ` · correcciones ${item.reworks} · aclaraciones ${item.reviewerComments} · ${item.reviewers.join(', ') || 'sin revisor'} · ${item.pullRequests.join(' ')}`
+      ` · devoluciones ${item.reworks} · aclaraciones ${item.reviewerComments} · ${item.reviewers.join(', ') || 'sin revisor'} · ${item.pullRequests.join(' ')}`
     print(
       [
-        `PR aprobados sin retrabajo (meta ${formatRate(FIRST_ATTEMPT_TARGET)}):`,
+        `PR aprobados sin devolución del revisor (meta ${formatRate(FIRST_ATTEMPT_TARGET)}):`,
         ...results.flatMap(({ period, metrics, deliveries }) => [
-          `  ${period.label}: ${formatRate(metrics.rate)} (${metrics.firstAttempt} de ${metrics.closed} entregas)` +
+          `  ${period.label}: ${formatRate(metrics.rate)} (${metrics.firstAttempt} de ${metrics.closed} PR)` +
             ` · aclaraciones del revisor: ${metrics.reviewerComments}`,
           ...deliveries.map(line),
         ]),

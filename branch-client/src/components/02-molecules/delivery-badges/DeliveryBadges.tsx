@@ -14,9 +14,16 @@ const toneOf = (delivery: Delivery) =>
   delivery.firstAttempt === true ? 'approved' : delivery.firstAttempt === false ? 'rework' : 'pending'
 
 const describe = (delivery: Delivery) => {
-  if (delivery.firstAttempt === true) return 'PR aprobado al primer intento'
-  if (delivery.firstAttempt === null) return 'PR abierto, sin correcciones'
-  return `Requirió ${delivery.reworks} ${delivery.reworks === 1 ? 'corrección' : 'correcciones'}`
+  const [pullRequest] = delivery.pullRequests
+  if (delivery.firstAttempt === true) return 'Aprobado sin devolución'
+  if (delivery.firstAttempt === null) return 'PR abierto, sin devoluciones'
+  const reasons = [
+    pullRequest.changesRequested && `${pullRequest.changesRequested} cambios pedidos`,
+    pullRequest.reviewerComments && `${pullRequest.reviewerComments} comentarios del revisor`,
+    pullRequest.reviewerCommits && `${pullRequest.reviewerCommits} commits del revisor`,
+    pullRequest.state === 'DECLINED' && 'declinado por el revisor',
+  ].filter(Boolean)
+  return `Devuelto: ${reasons.join(', ')}`
 }
 
 export function DeliveryBadges({ deliveries, error }: DeliveryBadgesProps) {
@@ -35,11 +42,11 @@ export function DeliveryBadges({ deliveries, error }: DeliveryBadgesProps) {
       )}
       <ul role="list" className="delivery-badges__list">
         {deliveries.map((delivery) => {
-          const last = delivery.pullRequests[delivery.pullRequests.length - 1]
+          const [last] = delivery.pullRequests
           const destination = DESTINATION_LABELS[delivery.destinationBranch] ?? delivery.destinationBranch
           return (
             <li
-              key={`${delivery.ticketKey}-${delivery.destinationBranch}`}
+              key={last.id}
               className={classNames('delivery-badges__item', `delivery-badges__item--${toneOf(delivery)}`)}
             >
               <span className="delivery-badges__destination">{destination}</span>

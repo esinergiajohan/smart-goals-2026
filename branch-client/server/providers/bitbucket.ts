@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs'
 import type { PullRequestState } from '../../src/types/pullRequest.ts'
-import type { GitProvider, PullRequestQuery, RemotePullRequest } from './types.ts'
+import { AUTHOR_PATTERN, type GitProvider, type PullRequestQuery, type RemotePullRequest } from './types.ts'
 
 const API = 'https://api.bitbucket.org/2.0'
 const REMOTE = /bitbucket\.org[:/]([^/]+)\/([^/]+?)(?:\.git)?\/?$/
@@ -20,6 +20,12 @@ interface BitbucketPullRequest {
   links: { html: { href: string } }
 }
 
+interface BitbucketCommit {
+  hash: string
+  parents: unknown[]
+  author?: { raw?: string; user?: { display_name: string } }
+}
+
 interface BitbucketActivity {
   update?: {
     state: PullRequestState
@@ -29,7 +35,7 @@ interface BitbucketActivity {
   }
   approval?: { user: { display_name: string } }
   changes_request?: { user: { display_name: string } }
-  comment?: { user?: { uuid: string } }
+  comment?: { user?: { uuid: string; display_name?: string } }
 }
 
 interface Page<T> {
@@ -100,13 +106,26 @@ export const createBitbucketProvider = (remoteUrl: string, envFile: string): Git
   }
 
   const toRemote = async (pullRequest: BitbucketPullRequest): Promise<RemotePullRequest> => {
-    const activity = await all<BitbucketActivity>(`${base}/pullrequests/${pullRequest.id}/activity?pagelen=${PAGE_SIZE}`)
+    const [activity, commits] = await Promise.all([
+      all<BitbucketActivity>(`${base}/pullrequests/${pullRequest.id}/activity?pagelen=${PAGE_SIZE}`),
+      all<BitbucketCommit>(`${base}/pullrequests/${pullRequest.id}/commits?pagelen=${PAGE_SIZE}`),
+    ])
     const pushedCommits = new Set(
       activity
         .map((entry) => (entry.update?.state === 'OPEN' ? entry.update.source?.commit?.hash : undefined))
         .filter((hash): hash is string => Boolean(hash)),
     )
     const closing = activity.find((entry) => entry.update && entry.update.state !== 'OPEN')
+    const reviewers = new Set(
+      [
+        ...activity.map((entry) => entry.approval?.user.display_name),
+        ...activity.map((entry) => entry.changes_request?.user.display_name),
+        ...activity.map((entry) =>
+          entry.comment && entry.comment.user?.uuid !== pullRequest.author.uuid ? entry.comment.user?.display_name : undefined,
+        ),
+        pullRequest.state === 'MERGED' ? closing?.update?.author?.display_name : undefined,
+      ].filter((name): name is string => Boolean(name) && !AUTHOR_PATTERN.test(name ?? '')),
+    )
 
     return {
       externalId: pullRequest.id,
@@ -134,6 +153,13 @@ export const createBitbucketProvider = (remoteUrl: string, envFile: string): Git
         (entry) => entry.comment && entry.comment.user?.uuid !== pullRequest.author.uuid,
       ).length,
       ...(closing?.update?.author?.uuid && { closedBy: closing.update.author.uuid }),
+      reviewerCommits: commits.filter(
+        (commit) =>
+          commit.parents.length === 1 &&
+          [commit.author?.user?.display_name, commit.author?.raw].some(
+            (name) => name && [...reviewers].some((reviewer) => name.includes(reviewer)),
+          ),
+      ).length,
       ...(pullRequest.state === 'MERGED' &&
         closing?.update?.author && { mergedBy: closing.update.author.display_name }),
     }

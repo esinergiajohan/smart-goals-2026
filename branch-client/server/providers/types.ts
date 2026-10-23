@@ -16,7 +16,10 @@ export interface RemotePullRequest {
   reviewerComments: number
   mergedBy?: string
   closedBy?: string
+  reviewerCommits: number
 }
+
+export const AUTHOR_PATTERN = new RegExp(process.env.BRANCH_AUTHOR_PATTERN ?? 'johan|riascos', 'i')
 
 export interface PullRequestQuery {
   branches?: string[]

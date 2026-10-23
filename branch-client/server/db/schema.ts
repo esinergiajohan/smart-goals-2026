@@ -78,6 +78,7 @@ export const pullRequests = sqliteTable(
     reviewerComments: integer('reviewer_comments').notNull().default(0),
     mergedBy: text('merged_by'),
     selfClosed: integer('self_closed', { mode: 'boolean' }).notNull().default(false),
+    reviewerCommits: integer('reviewer_commits').notNull().default(0),
     syncedAt: text('synced_at').notNull(),
   },
   (table) => [uniqueIndex('pull_requests_repository_external').on(table.repositoryId, table.externalId)],

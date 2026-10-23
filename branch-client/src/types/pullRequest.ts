@@ -19,6 +19,7 @@ export interface PullRequest {
   reviewerComments: number
   mergedBy?: string
   selfClosed: boolean
+  reviewerCommits: number
 }
 
 export interface Delivery {

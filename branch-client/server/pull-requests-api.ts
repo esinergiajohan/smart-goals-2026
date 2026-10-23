@@ -31,6 +31,7 @@ const toPullRequest = (row: PullRequestRow): PullRequest => ({
   pushesAfterOpen: row.pushesAfterOpen,
   reviewerComments: row.reviewerComments,
   selfClosed: row.selfClosed,
+  reviewerCommits: row.reviewerCommits,
   ...(row.mergedBy && { mergedBy: row.mergedBy }),
   ...(row.ticketKey && { ticketKey: row.ticketKey }),
   ...(row.closedAt && { closedAt: row.closedAt }),
