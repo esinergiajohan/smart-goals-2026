@@ -1,423 +1,399 @@
 <div align="center">
 
-# Branch Manager · Jira Smart Project
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:064e3b,100:1e1b4b&height=220&section=header&text=Branch%20Manager&fontSize=60&fontColor=ffffff&fontAlignY=36&desc=Del%20ticket%20de%20Jira%20al%20PR%20aprobado%20a%20la%20primera&descSize=20&descAlignY=58&animation=fadeIn" width="100%" alt="Branch Manager"/>
 
-**Del ticket de Jira al PR aprobado a la primera, con revisión previa de IA.**
-
-Planifica cada ticket con IA, revisa el PR con **pr-review de esinergia + Claude** antes de que llegue al líder
-y mide cuántos PR se aprueban sin devolución en todos los proyectos.
-
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-24-339933?logo=node.js&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-local-003B57?logo=sqlite&logoColor=white)
-![Claude](https://img.shields.io/badge/IA-Claude-D97757?logo=anthropic&logoColor=white)
-![pr--review](https://img.shields.io/badge/pr--review-esinergia-34D399)
-
-<br/>
-
-<img src="branch-client/public/docs/report.png" alt="Informe de objetivos" width="900"/>
+![React](https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js_24-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+![Claude](https://img.shields.io/badge/Claude-D97757?style=for-the-badge&logo=anthropic&logoColor=white)
+![pr-review](https://img.shields.io/badge/pr--review-esinergia-10B981?style=for-the-badge)
 
 </div>
 
-<br/>
-
-> [!IMPORTANT]
-> ## ✅ 2 de 3 objetivos cumplidos
->
-> | | Objetivo | Resultado | Meta |
-> |:-:|---|:-:|:-:|
-> | ✅ | **Capa 2** · PR de Git aprobados sin retrabajo | **86,7 %** · 26 de 30 PR | ≥ 80 % |
-> | ✅ | **Capa 3** · Revisión previa de PR con pr-review e IA | **−80 %** de aclaraciones del líder | ≥ −80 % |
-> | ⏳ | **Capa 1** · Biblioteca de conocimiento de Site Studio | Se reporta aparte | 4/5 con ≥ 6 devs |
->
-> Datos de Bitbucket y GitHub al 22 de octubre de 2026. El informe vivo está en **`/informe`** y se descarga en PDF o CSV.
-
-<br/>
-
-> [!TIP]
-> ### Cómo leer las cifras
->
-> | Cifra | Qué significa |
-> |---|---|
-> | **86,7 %** · PR aprobados sin retrabajo | De cada 100 PR que llegaron al líder, cuántos aprobó sin pedir cambios ni dejar comentarios. Octubre: 26 de 30. |
-> | **0,33 → 0,07** · Aclaraciones por PR | Promedio de dudas o correcciones del líder en cada PR. 0,33 es una cada 3 PR; 0,07 es una cada 15 PR. |
-> | **−80 %** · Reducción de aclaraciones | Cuánto bajaron las aclaraciones del líder frente a septiembre. |
-> | **pp** · Puntos porcentuales | La diferencia directa entre dos porcentajes: de 55,6 % a 86,7 % son +31,1 pp. |
-> | **★ Septiembre** · Línea base | El mes de referencia, trabajado sin pr-review. |
-
-<br/>
-
-## Contenido
-
-| | |
-|---|---|
-| **📊 Informe** | [Resultados](#-resultados) · [Capa 2](#capa-2--pr-de-git-aprobados-sin-retrabajo) · [Capa 3](#capa-3--revisión-previa-de-pr-con-pr-review-e-ia) · [Capa 1](#capa-1--biblioteca-de-site-studio) |
-| **📘 Documentación** | [Flujo](#-flujo-de-trabajo) · [Anatomía de la card](#-anatomía-de-la-card) · [Agentes y servicios](#-agentes-y-servicios) · [Tablero](#-el-tablero) · [CLI para agentes](#-cli-para-agentes-de-ia) |
-| **⚙️ Técnico** | [Arquitectura](#-arquitectura) · [Instalación](#-instalación) · [Estructura](#-estructura-del-proyecto) · [Seguridad](#-seguridad) |
-
-<br/>
-
----
-
-# 📊 Resultados
-
-<br/>
-
-## Capa 2 · PR de Git aprobados sin retrabajo
-
-> Lograr que al menos el 80 % de los pull requests de Git entre octubre y el 30 de noviembre de 2026, realizados con apoyo de IA, se aprueben sin retrabajo, verificando antes de cada envío los criterios de aceptación del ticket y los estándares técnicos, definiendo y confirmando con el solicitante los criterios cuando el ticket no los trae, y comparándolo contra la línea base de septiembre registrada en Branch Manager.
-
 <table>
 <tr>
-<td align="center" width="33%"><h1>86,7 %</h1>PR aprobados a la primera<br/><sub>octubre · 26 de 30</sub></td>
-<td align="center" width="33%"><h1>▲ +31,1 pp</h1>frente a la línea base<br/><sub>★ septiembre · 55,6 %</sub></td>
-<td align="center" width="33%"><h1>4</h1>proyectos medidos<br/><sub>redsalud · unisabana · unbosque · fogafin</sub></td>
+<td width="58%" valign="top">
+
+### 🧭 Qué es
+
+Un tablero para llevar cada ticket de Jira hasta producción.
+La IA **planifica** el ticket, **revisa el PR antes que el líder** y el tablero **mide** cuántos PR se aprueban a la primera.
+
+<br/>
+
+### ✅ 2 de 3 objetivos cumplidos
+
+| | Objetivo | Resultado |
+|:-:|---|:-:|
+| ✅ | **Capa 2** · PR aprobados sin retrabajo | **86,7 %** <sub>meta 80 %</sub> |
+| ✅ | **Capa 3** · Revisión previa con pr-review e IA | **−80 %** <sub>meta −80 %</sub> |
+| ⏳ | **Capa 1** · Biblioteca de Site Studio | <sub>se reporta aparte</sub> |
+
+<br/>
+
+[![Informe](https://img.shields.io/badge/📊_Ver_informe-10B981?style=for-the-badge)](#-informe)
+[![Documentación](https://img.shields.io/badge/📘_Documentación-4F46E5?style=for-the-badge)](#-documentación)
+[![Técnico](https://img.shields.io/badge/⚙️_Técnico-27272A?style=for-the-badge)](#-técnico)
+
+<sub>Datos de Bitbucket y GitHub al 22 de octubre de 2026.</sub>
+
+</td>
+<td width="42%" align="center" valign="top">
+
+<img src="branch-client/public/docs/card.png" alt="Card de un ticket" width="300"/>
+
+<sub><b>La card de un ticket</b></sub>
+
+</td>
 </tr>
 </table>
 
+<br/>
+
+<table>
+<tr>
+<td align="center" width="25%"><h1>86,7 %</h1><sub>PR aprobados a la primera</sub></td>
+<td align="center" width="25%"><h1>−80 %</h1><sub>aclaraciones del líder</sub></td>
+<td align="center" width="25%"><h1>26 / 30</h1><sub>PR de octubre sin devolución</sub></td>
+<td align="center" width="25%"><h1>4</h1><sub>proyectos medidos</sub></td>
+</tr>
+</table>
+
+<br/>
+
+### 🔎 Cómo leer las cifras
+
+<table>
+<tr>
+<td width="33%" valign="top"><b>86,7 % · Aprobados sin retrabajo</b><br/><sub>De cada 100 PR que llegaron al líder, cuántos aprobó sin pedir cambios ni comentar.</sub></td>
+<td width="33%" valign="top"><b>0,33 → 0,07 · Aclaraciones por PR</b><br/><sub>Dudas o correcciones del líder por PR: una cada 3 PR antes, una cada 15 ahora.</sub></td>
+<td width="33%" valign="top"><b>−80 % · Reducción</b><br/><sub>Cuánto bajaron las aclaraciones del líder frente a septiembre.</sub></td>
+</tr>
+<tr>
+<td valign="top"><b>pp · Puntos porcentuales</b><br/><sub>Diferencia directa entre porcentajes: de 55,6 % a 86,7 % son +31,1 pp.</sub></td>
+<td valign="top"><b>★ Septiembre · Línea base</b><br/><sub>El mes de referencia, trabajado sin pr-review.</sub></td>
+<td valign="top"><b>Devuelto</b><br/><sub>El revisor pidió cambios, comentó, hizo commits en la rama o lo rechazó.</sub></td>
+</tr>
+</table>
+
+<br/>
+
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:064e3b,100:1e1b4b&height=2" width="100%"/>
+
+# 📊 Informe
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### Capa 2 · Aprobados sin retrabajo
+
 ```mermaid
 xychart-beta
-  title "PR aprobados a la primera (%)"
-  x-axis ["★ Septiembre", "Octubre"]
-  y-axis "Porcentaje" 0 --> 100
+  x-axis ["★ Sept", "Oct"]
+  y-axis "%" 0 --> 100
   bar [55.6, 86.7]
   line [80, 80]
 ```
 
-<sub>La línea marca la meta del 80 %. ★ Septiembre es la línea base, trabajo sin pr-review.</sub>
+<sub>La línea es la meta del 80 %.</sub>
 
-### Por proyecto
+</td>
+<td width="50%" valign="top">
 
-| Proyecto | ★ Septiembre | Octubre | Tendencia |
-|---|:-:|:-:|:-:|
-| **redsalud** · Bitbucket | 🟩 100 % · 2/2 | 🟩 **100 % · 20/20** | ➡️ |
-| **unisabana** · GitHub | 🟥 33,3 % · 1/3 | 🟨 **66,7 % · 4/6** | ⬆️ |
-| **unbosque-portal** · GitHub | 🟥 33,3 % · 1/3 | 🟨 **50 % · 2/4** | ⬆️ |
-| **fogafin** · GitHub | 🟩 100 % · 1/1 | — | |
-| **Total** | **55,6 % · 5/9** | **86,7 % · 26/30** | ⬆️ |
-
-<p align="center"><img src="branch-client/public/docs/report-panels.png" alt="Gráfico por mes y mapa de calor por proyecto" width="900"/></p>
-
-<details>
-<summary><b>Observaciones</b></summary>
-<br/>
-
-- **La prueba:** la aprobación a la primera del líder, registrada en Bitbucket (redsalud) y GitHub (unisabana, unbosque-portal, fogafin).
-- **Cómo se cuenta:** cada PR hacia `staging` o `develop`. Es retrabajo si el revisor lo devolvió: pidió cambios, dejó comentarios, tuvo que hacer commits en la rama o lo rechazó. No cuentan los PR que el propio autor cerró sin revisión.
-- **Cómo se logró:** antes de cada envío se revisaron con pr-review y la IA los criterios de aceptación del ticket y los estándares técnicos de esinergia. Cuando el ticket no traía criterios, se definieron y confirmaron con el solicitante.
-- **Las 4 devoluciones de octubre:** dos comentarios en unbosque-portal (#125 y #129) y dos ajustes que hizo el revisor en unisabana (#419 y #421).
-
-</details>
-
-<br/>
-
-## Capa 3 · Revisión previa de PR con pr-review e IA
-
-> Integrar en Branch Manager el código de pr-review de Esinergia y combinarlo con un modelo de IA (Gemini o Claude) antes del 30 de noviembre de 2026, para aplicar la revisión del PR antes de que llegue al líder: al iniciar cada ticket, leyéndolo desde Jira sin copiarlo a mano y dejando una nota sobre cómo abordarlo según sus criterios; y antes de solicitar el PR a staging, revisando la entrega y dejando las correcciones a aplicar o el visto bueno, en Branch Manager o como comentario en Jira si la API lo permite. Se demostrará con 3 entregas comparadas una reducción de al menos 80 % en las aclaraciones durante la revisión del líder.
-
-<table>
-<tr>
-<td align="center" width="33%"><h1>−80 %</h1>aclaraciones del líder<br/><sub>por PR</sub></td>
-<td align="center" width="33%"><h1>0,33 → 0,07</h1>aclaraciones por PR<br/><sub>★ septiembre → octubre</sub></td>
-<td align="center" width="33%"><h1>3 → 0</h1>en las 3 entregas comparadas<br/><sub>−100 %</sub></td>
-</tr>
-</table>
+### Capa 3 · Aclaraciones por PR
 
 ```mermaid
 xychart-beta
-  title "Aclaraciones del líder por PR"
-  x-axis ["★ Septiembre", "Octubre"]
+  x-axis ["★ Sept", "Oct"]
   y-axis "Aclaraciones" 0 --> 0.4
   bar [0.33, 0.07]
 ```
 
-### 3 entregas comparadas
-
-<table>
-<tr><th width="50%">★ Septiembre · sin pr-review</th><th width="50%">Octubre · con pr-review</th></tr>
-<tr>
-<td>
-
-| PR | Ticket | Aclaraciones |
-|---|---|:-:|
-| unbosque-portal #110 | EVO-926 | 🟥 1 |
-| unbosque-portal #120 | EVO-926 | 🟥 1 |
-| unisabana #409 | ESNEVO-880 | 🟥 1 |
+<sub>De 0,33 a 0,07: −80 %.</sub>
 
 </td>
-<td>
+</tr>
+<tr>
+<td valign="top">
 
-| PR | Ticket | Aclaraciones |
-|---|---|:-:|
-| redsalud #1994 | ESNEVO-2446 | 🟩 0 |
-| redsalud #1992 | ESNEVO-2544 | 🟩 0 |
-| redsalud #1981 | ESNEVO-2759 | 🟩 0 |
+#### Por proyecto
+
+| Proyecto | ★ Sept | Oct |
+|---|:-:|:-:|
+| **redsalud** | 🟩 2/2 | 🟩 **20/20** |
+| **unisabana** | 🟥 1/3 | 🟨 **4/6** |
+| **unbosque-portal** | 🟥 1/3 | 🟨 **2/4** |
+| **fogafin** | 🟩 1/1 | — |
+| **Total** | **55,6 %** | **86,7 %** |
+
+</td>
+<td valign="top">
+
+#### 3 entregas comparadas
+
+| ★ Septiembre · sin pr-review | | Octubre · con pr-review | |
+|---|:-:|---|:-:|
+| unbosque #110 | 🟥 1 | redsalud #1994 | 🟩 0 |
+| unbosque #120 | 🟥 1 | redsalud #1992 | 🟩 0 |
+| unisabana #409 | 🟥 1 | redsalud #1981 | 🟩 0 |
+| **Aclaraciones** | **3** | | **0** |
 
 </td>
 </tr>
 </table>
 
-### Uso de la IA
+### 🤖 Uso de la IA
 
-| Momento | Qué hace | Dónde |
-|---|---|---|
-| **Al iniciar el ticket** | Claude lee el ticket, su historia y sus comentarios desde Jira y deja el plan con los criterios de pr-review | Card → «Generar plan» → «Publicar en Jira» |
-| **Antes del PR a staging** | El kit pr-review y Claude revisan la rama `-test`, dejan correcciones o visto bueno y certifican el resultado | Card → «Revisar» |
-| **Después del PR** | Se mide si el líder lo aprobó a la primera | Card → Pull requests · Informe |
+<table>
+<tr>
+<td width="33%" valign="top" align="center"><h3>1 · Al iniciar</h3>Claude lee el ticket desde Jira y deja el <b>plan de abordaje</b>.<br/><br/><code>Capa 3</code></td>
+<td width="33%" valign="top" align="center"><h3>2 · Antes del PR</h3>pr-review y Claude <b>revisan la rama -test</b> y certifican.<br/><br/><code>Capa 3</code></td>
+<td width="33%" valign="top" align="center"><h3>3 · Después del PR</h3>Se mide si el líder lo <b>aprobó a la primera</b>.<br/><br/><code>Capa 2</code></td>
+</tr>
+</table>
+
+<details>
+<summary><b>Objetivos completos y observaciones</b></summary>
+<br/>
+
+**Capa 2.** Lograr que al menos el 80 % de los pull requests de Git entre octubre y el 30 de noviembre de 2026, realizados con apoyo de IA, se aprueben sin retrabajo, comparándolo contra la línea base de septiembre registrada en Branch Manager.
+
+**Capa 3.** Integrar en Branch Manager el código de pr-review de esinergia con un modelo de IA, para revisar el PR antes de que llegue al líder, y demostrar con 3 entregas comparadas una reducción de al menos 80 % en las aclaraciones.
+
+**Capa 1.** Biblioteca de conocimiento de Site Studio en video, con calificación ≥ 4/5 de mínimo 6 desarrolladores. Se reporta aparte.
+
+- **La prueba:** la aprobación a la primera del líder, registrada en Bitbucket y GitHub.
+- **No cuentan:** los PR que el propio autor cerró sin revisión.
+- **Devoluciones de octubre:** unbosque-portal #125 y #129 (comentarios) y unisabana #419 y #421 (ajustes del revisor).
+
+</details>
 
 <br/>
 
-## Capa 1 · Biblioteca de Site Studio
-
-> Construir y publicar una biblioteca de conocimiento de Site Studio en video para el equipo Frontend que cubra los temas de dependencia confirmados con los seniors, y lograr una calificación promedio de al menos 4 sobre 5 por parte de mínimo 6 desarrolladores antes del 30 de noviembre de 2026.
-
-⏳ Se gestiona y se reporta por fuera de Branch Manager.
-
-<br/>
-
----
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:064e3b,100:1e1b4b&height=2" width="100%"/>
 
 # 📘 Documentación
 
-<br/>
-
-## 🔁 Flujo de trabajo
+### 🔁 Flujo
 
 ```mermaid
-flowchart TB
-  subgraph antes[Antes del PR · revisión previa]
-    direction LR
-    A([Ticket en Jira]) --> B[Card]
-    B --> C{{Generar plan<br/>Claude + pr-review}}
-    C --> D[Implementación]
-    D --> E[Rama -test]
-    E --> F{{Revisar<br/>pr-review + Claude}}
-    F -. pide ajustes .-> D
-  end
-  subgraph despues[Después del PR · resultado medido]
-    direction LR
-    G[PR a DEV y STG] --> H[Revisión del líder]
-    H --> I([Aprobado sin devolución])
-    I --> J[(Métrica e informe)]
-  end
-  antes -- aprobado y certificado --> despues
+flowchart LR
+  A([Ticket en Jira]) --> C{{Plan<br/>Claude + pr-review}} --> D[Implementación] --> F{{Revisar -test<br/>pr-review + Claude}}
+  F -. ajustes .-> D
+  F --> G[PR a DEV y STG] --> H[Líder] --> I([Aprobado a la primera]) --> J[(Informe)]
+  classDef ia fill:#022c22,stroke:#34d399,color:#f4f4f5
+  classDef meta fill:#451a03,stroke:#fbbf24,color:#fcd34d
+  class C,F ia
+  class I,J meta
 ```
 
-<br/>
-
-## 🧩 Anatomía de la card
+### 🧩 Anatomía de la card
 
 <table>
 <tr>
-<td width="38%" valign="top"><img src="branch-client/public/docs/card.png" alt="Card de un ticket" width="100%"/></td>
-<td valign="top">
-
-| # | Parte | Qué hace | Qué se dispara | Objetivo |
-|:-:|---|---|---|:-:|
-| 1 | **Encabezado** | Clave, título, fechas y estado en Jira (franja de color) | Jira | Base |
-| 2 | **Comentario destacado** | Fija un comentario de Jira a la vista | Jira | Base |
-| 3 | **Plan de abordaje** | Plan del ticket con criterios, preguntas, archivos, pasos, riesgos y pruebas | Jira · Claude · repo | Capa 3 · Capa 2 |
-| 4 | **Ramas** | Trabajo, DEV y STG; con «Release», las ramas unidas | Base local | Base |
-| 5 | **Pull requests** | Cada PR con «Aprobado sin devolución», «Devuelto» o «Abierto» | Bitbucket · GitHub | Capa 2 |
-| 6 | **Revisión local** | «Revisar» simula el PR con pr-review + Claude y certifica | Repo · Jira · Kit · Claude | Capa 3 |
-| 7 | **Despliegue** | Marca el ticket en producción o hace rollback | Base local | Base |
-
+<td width="50%" align="center" valign="top">
+<img src="branch-client/public/docs/card-header.png" width="100%"/><br/>
+<b>1 · Encabezado</b><br/><sub>Clave, título, fechas y estado en Jira.</sub>
+</td>
+<td width="50%" align="center" valign="top">
+<img src="branch-client/public/docs/card-featured.png" width="100%"/><br/>
+<b>2 · Comentario destacado</b><br/><sub>Un comentario de Jira fijado a la vista.</sub>
+</td>
+</tr>
+<tr>
+<td align="center" valign="top">
+<img src="branch-client/public/docs/card-plan.png" width="100%"/><br/>
+<b>3 · Plan de abordaje</b> <code>Capa 3</code><br/><sub>Claude lee el ticket y propone criterios, pasos, riesgos y pruebas. Se publica en Jira como nota interna.</sub>
+</td>
+<td align="center" valign="top">
+<img src="branch-client/public/docs/card-branches.png" width="100%"/><br/>
+<b>4 · Ramas</b><br/><sub>Trabajo, DEV y STG; con «Release», las ramas unidas.</sub>
+</td>
+</tr>
+<tr>
+<td align="center" valign="top">
+<img src="branch-client/public/docs/card-pull-requests.png" width="100%"/><br/>
+<b>5 · Pull requests</b> <code>Capa 2</code><br/><sub>Cada PR con «Aprobado sin devolución», «Devuelto» o «Abierto».</sub>
+</td>
+<td align="center" valign="top">
+<img src="branch-client/public/docs/card-review-history.png" width="100%"/><br/>
+<b>6 · Revisión local</b> <code>Capa 3</code><br/><sub>«Revisar» simula el PR con pr-review + Claude y certifica.</sub>
 </td>
 </tr>
 </table>
 
-<details>
-<summary><b>Ver cada parte en detalle</b></summary>
-<br/>
+### 🤖 Agentes y servicios
 
-| Parte | Captura |
-|---|---|
-| **3 · Plan de abordaje** — se usa al iniciar el ticket. «Publicar en Jira» lo deja como nota interna. | <img src="branch-client/public/docs/card-plan-open.png" width="420"/> |
-| **4 · Ramas** — los nombres que usa la revisión. | <img src="branch-client/public/docs/card-branches.png" width="420"/> |
-| **5 · Pull requests** — la evidencia de la meta del 80 %. | <img src="branch-client/public/docs/card-pull-requests.png" width="420"/> |
-| **6 · Revisión local** — cada «Revisar» queda como iteración. | <img src="branch-client/public/docs/card-review-history.png" width="420"/> |
-
-</details>
-
-<br/>
-
-## 🤖 Agentes y servicios
-
-| Agente o servicio | Qué hace | Se dispara con | Objetivo |
-|---|---|---|:-:|
-| **Claude · plan de abordaje** | Lee el ticket desde Jira y el código, y propone cómo abordarlo con los criterios de pr-review | «Generar plan» · `bm plan` | Capa 3 |
-| **Kit pr-review de esinergia** | Reúne la evidencia de la rama `-test`: diferencias, flujo de ramas y bloqueos | «Revisar» · `bm review` | Capa 3 |
-| **Claude · revisión de PR** | Aplica la política de pr-review en solo lectura: veredicto, hallazgos y comentario | «Revisar» · `bm review` | Capa 3 |
-| **Certificación pr-review** | Firma el resultado con el commit exacto revisado | Automática | Capa 3 |
-| **Bitbucket y GitHub** | Aprobaciones, cambios pedidos, comentarios y commits del revisor | Tablero · «Sincronizar PR» | Capa 2 |
-| **Jira** | Tickets, comentarios y notas internas | Buscador · plan · destacados | Base |
+<table>
+<tr>
+<td width="33%" valign="top"><b>🧠 Claude · Plan</b><br/><sub>Lee el ticket y el código y propone cómo abordarlo.</sub><br/><code>Generar plan</code> <code>Capa 3</code></td>
+<td width="33%" valign="top"><b>🧪 Kit pr-review</b><br/><sub>Reúne la evidencia de la rama -test: diferencias, ramas y bloqueos.</sub><br/><code>Revisar</code> <code>Capa 3</code></td>
+<td width="33%" valign="top"><b>🔍 Claude · Revisión</b><br/><sub>Aplica la política de pr-review en solo lectura y da el veredicto.</sub><br/><code>Revisar</code> <code>Capa 3</code></td>
+</tr>
+<tr>
+<td valign="top"><b>🔏 Certificación</b><br/><sub>Firma el resultado con el commit exacto revisado.</sub><br/><code>Automática</code> <code>Capa 3</code></td>
+<td valign="top"><b>🔀 Bitbucket y GitHub</b><br/><sub>Aprobaciones, cambios pedidos, comentarios y commits del revisor.</sub><br/><code>Sincronizar</code> <code>Capa 2</code></td>
+<td valign="top"><b>📋 Jira</b><br/><sub>Tickets, comentarios y notas internas.</sub><br/><code>Buscador</code> <code>Plan</code></td>
+</tr>
+</table>
 
 <details>
-<summary><b>Qué pasa al pulsar «Revisar»</b></summary>
+<summary><b>Qué pasa al pulsar «Revisar» y «Generar plan»</b></summary>
 
 ```mermaid
 sequenceDiagram
   autonumber
   actor Tu as Tú
-  participant Card as Card
   participant API as Branch Manager
-  participant Git as Repositorio local
   participant Jira as Jira
   participant Kit as Kit pr-review
   participant IA as Claude
-  Tu->>Card: Pulsas «Revisar»
-  Card->>API: Revisión de la rama -test
-  API->>Git: ¿La rama existe y no está mezclada?
+  Tu->>API: «Revisar»
   API->>Jira: Lee el ticket
-  API->>Kit: Recopila la evidencia
-  API->>IA: Aplica la política de pr-review en solo lectura
+  API->>Kit: Recopila la evidencia de la rama -test
+  API->>IA: Aplica la política de pr-review
   IA-->>API: Veredicto, hallazgos y comentario
   API->>Kit: Certifica el resultado
-  API-->>Card: Nueva iteración en el historial
+  API-->>Tu: Nueva iteración en la card
 ```
-
-</details>
-
-<details>
-<summary><b>Qué pasa al pulsar «Generar plan»</b></summary>
 
 ```mermaid
 sequenceDiagram
   autonumber
   actor Tu as Tú
-  participant Card as Card
   participant API as Branch Manager
   participant Jira as Jira
   participant IA as Claude
-  Tu->>Card: Pulsas «Generar plan»
-  Card->>API: Plan de abordaje del ticket
+  Tu->>API: «Generar plan»
   API->>Jira: Lee ticket, historia, épica y comentarios
-  API->>IA: Aplica los criterios de pr-review y revisa el código
+  API->>IA: Criterios de pr-review y código
   IA-->>API: Criterios, preguntas, pasos, riesgos y pruebas
-  API-->>Card: Plan en la card
-  Tu->>Card: «Publicar en Jira»
+  API-->>Tu: Plan en la card
+  Tu->>API: «Publicar en Jira»
   API->>Jira: Nota interna con tu cuenta
 ```
 
 </details>
 
-<br/>
+### 🖥️ Tablero e informe
 
-## 🖥️ El tablero
+<table>
+<tr>
+<td width="50%" align="center" valign="top">
+<img src="branch-client/public/docs/dashboard.png" width="100%"/><br/>
+<b>Tablero</b><br/><sub>Buscador de Jira, cards, métrica del mes y tickets asignados.</sub>
+</td>
+<td width="50%" align="center" valign="top">
+<img src="branch-client/public/docs/report.png" width="100%"/><br/>
+<b>Informe</b> · <code>/informe</code><br/><sub>Los 3 objetivos, meses comparados y descarga en PDF y CSV.</sub>
+</td>
+</tr>
+</table>
 
-<p align="center"><img src="branch-client/public/docs/dashboard.png" alt="Tablero" width="900"/></p>
+### ⌨️ CLI para agentes de IA
 
-| Zona | Para qué sirve |
+<table>
+<tr>
+<td width="50%" valign="top">
+
+| Comando | Qué hace |
 |---|---|
-| **Buscador** | Busca un ticket de Jira y crea su card |
-| **Barra de la métrica** | ★ Septiembre contra octubre y noviembre, con la meta y las aclaraciones |
-| **Pendientes · En producción** | Tus cards según su estado de despliegue |
-| **Abiertos, en curso y bloqueados** | Tus tickets asignados en Jira, con el último comentario |
-| **Informe · Documentación** | `/informe` (PDF y CSV) y `/documentacion` |
+| `bm plan CLAVE --wait` | Plan de abordaje |
+| `bm plan-publish CLAVE` | Publica el plan en Jira |
+| `bm review CLAVE --wait` | Revisa la rama `-test` |
+
+</td>
+<td width="50%" valign="top">
+
+| Comando | Qué hace |
+|---|---|
+| `bm prs CLAVE --sync` | PR del ticket y su resultado |
+| `bm metrics --sync --detail` | Métrica con cada PR |
+| `bm card add CLAVE` | Crea la card |
+
+</td>
+</tr>
+</table>
 
 <br/>
 
-## ⌨️ CLI para agentes de IA
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:064e3b,100:1e1b4b&height=2" width="100%"/>
 
-Todo lo que hace la card también se hace desde la terminal, para que cualquier agente lo use.
+# 🔧 Técnico
 
-| Comando | Qué hace | Objetivo |
-|---|---|:-:|
-| `bm plan CLAVE --wait` | Genera el plan de abordaje | Capa 3 |
-| `bm plan-publish CLAVE` | Publica el plan en Jira (con permiso del usuario) | Capa 3 |
-| `bm review CLAVE --wait` | Revisa la rama `-test` con pr-review | Capa 3 |
-| `bm prs CLAVE --sync` | PR del ticket y su resultado | Capa 2 |
-| `bm metrics --sync --detail` | Métrica de objetivos con el detalle de cada PR | Capa 2 |
-| `bm card add CLAVE` | Crea la card de un ticket | Base |
+<table>
+<tr>
+<td width="50%" valign="top">
 
-<br/>
-
----
-
-# ⚙️ Técnico
-
-<br/>
-
-## 🏗️ Arquitectura
+### 🏗️ Arquitectura
 
 ```mermaid
 flowchart TB
-  subgraph Navegador
-    T[Tablero]
-    R[Informe]
-    D[Documentación]
-  end
-  CLI[CLI bm<br/>para agentes de IA]
-  T & R & D & CLI --> API[API local<br/>127.0.0.1:8787]
-  API --> DB[(SQLite<br/>cards, planes,<br/>revisiones, PR)]
+  UI[Tablero · Informe · Docs] --> API[API local]
+  CLI[CLI bm] --> API
+  API --> DB[(SQLite)]
   API --> J[Jira]
-  API --> BB[Bitbucket]
-  API --> GH[GitHub]
-  API --> CC[Claude<br/>modo solo lectura]
-  API --> KIT[Kit pr-review<br/>de esinergia]
-  KIT --> REPO[Repositorios locales]
-  CC --> REPO
+  API --> G[Bitbucket · GitHub]
+  API --> IA[Claude<br/>solo lectura]
+  API --> KIT[Kit pr-review]
+  classDef ia fill:#022c22,stroke:#34d399,color:#f4f4f5
+  class IA,KIT ia
 ```
 
-| Capa | Tecnología |
-|---|---|
-| Interfaz | React 19 · TypeScript · Vite · SCSS (atomic design) · Mermaid · jsPDF |
-| API local | Node.js 24 (`node:http`) · Drizzle ORM · SQLite (better-sqlite3) |
-| IA | Claude Code en modo headless, restringido y de solo lectura |
-| Revisión | Kit `ai-pr-review` de esinergia, usado de forma global |
-| Integraciones | Jira REST · Bitbucket API · GitHub (`gh`) |
+</td>
+<td width="50%" valign="top">
 
-<br/>
-
-## 🚀 Instalación
+### 🚀 Instalación
 
 ```bash
 cd branch-client
 npm install
-npm run dev        # tablero en http://localhost:5173 y API en http://127.0.0.1:8787
+npm run dev
 ```
 
-Variables en el `.env` de la raíz (solo los nombres):
+<sub>Tablero en <code>localhost:5173</code> · API en <code>127.0.0.1:8787</code></sub>
 
-| Variable | Para qué |
+| Variable (`.env` raíz) | Para qué |
 |---|---|
-| `JIRA_BASE_URL` · `JIRA_EMAIL` · `JIRA_API_TOKEN` | Leer tickets y publicar notas internas |
-| `BRANCH_CLAUDE_CONFIG_DIR` | Cuenta de Claude que usan el plan y la revisión |
-| `BITBUCKET_ENV_FILE` *(opcional)* | Archivo con las credenciales de Bitbucket |
-| `PR_REVIEW_KIT_HOME` *(opcional)* | Ruta del kit pr-review (por defecto `../pr-review`) |
+| `JIRA_BASE_URL` `JIRA_EMAIL` `JIRA_API_TOKEN` | Jira |
+| `BRANCH_CLAUDE_CONFIG_DIR` | Cuenta de Claude |
+| `BITBUCKET_ENV_FILE` | Bitbucket |
+| `PR_REVIEW_KIT_HOME` | Kit pr-review |
 
-GitHub usa la sesión de `gh` ya iniciada en el equipo.
+<sub>GitHub usa la sesión de <code>gh</code>.</sub>
 
-<br/>
+</td>
+</tr>
+<tr>
+<td valign="top">
 
-## 📁 Estructura del proyecto
+### 📁 Estructura
 
 ```
 branch-client/
-├── bin/bm.ts                  CLI para agentes de IA
-├── server/                    API local
-│   ├── providers/             Bitbucket y GitHub
-│   ├── review-runner.ts       pr-review + Claude + certificación
-│   ├── plan-runner.ts         Plan de abordaje
-│   └── db/                    Esquema y migraciones SQLite
-├── src/
-│   ├── components/            Atomic design: átomos → páginas
-│   │   └── 05-pages/          /informe y /documentacion
-│   ├── content/diagrams.ts    Diagramas de la documentación
-│   └── utils/deliveries.ts    Regla de «aprobado sin devolución»
-└── public/docs/               Capturas para la documentación
+├── bin/bm.ts          CLI
+├── server/            API local
+│   ├── providers/     Bitbucket y GitHub
+│   ├── review-runner  pr-review + Claude
+│   └── plan-runner    Plan de abordaje
+├── src/               React (atomic design)
+└── public/docs/       Capturas
 ```
 
-<br/>
+</td>
+<td valign="top">
 
-## 🔒 Seguridad
+### 🔒 Seguridad
 
-- Todo corre **en el equipo local**: la API escucha solo en `127.0.0.1` y rechaza peticiones de otros orígenes.
-- La IA trabaja en **solo lectura**: sin escritura de archivos, sin comandos que modifiquen el repositorio y sin MCP.
-- Las **credenciales** se filtran antes de lanzar procesos y nunca llegan a la IA ni al navegador.
-- Las publicaciones en Jira son **notas internas** y siempre piden confirmación.
+- 🏠 Todo corre **en local** (`127.0.0.1`).
+- 👁️ La IA trabaja en **solo lectura**.
+- 🔑 Las **credenciales** nunca llegan a la IA ni al navegador.
+- 📝 Jira solo recibe **notas internas**, con confirmación.
 
-<br/>
+</td>
+</tr>
+</table>
 
-<div align="center"><sub>esinergia S.A.S. · Johan Riascos · 2026</sub></div>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:1e1b4b,100:064e3b&height=120&section=footer&text=esinergia%20S.A.S.%20·%202026&fontSize=18&fontColor=ffffff&fontAlignY=72" width="100%"/>
