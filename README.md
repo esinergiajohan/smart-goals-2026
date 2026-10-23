@@ -36,12 +36,22 @@ La IA **planifica** el ticket, **revisa el PR antes que el líder** y el tablero
 [![Documentación](https://img.shields.io/badge/📘_Documentación-4F46E5?style=for-the-badge)](#-documentación)
 [![Técnico](https://img.shields.io/badge/⚙️_Técnico-27272A?style=for-the-badge)](#-técnico)
 
+<br/>
+
+### ⚡ Cómo funciona
+
+| | Paso | |
+|:-:|---|:-:|
+| 🧠 | **Planifica** · Claude lee el ticket de Jira y deja el plan | `Capa 3` |
+| 🔍 | **Revisa** · pr-review + Claude revisan la rama antes del PR | `Capa 3` |
+| 📈 | **Mide** · cuántos PR aprueba el líder a la primera | `Capa 2` |
+
 <sub>Datos de Bitbucket y GitHub al 22 de octubre de 2026.</sub>
 
 </td>
 <td width="42%" align="center" valign="top">
 
-<img src="branch-client/public/docs/card.png" alt="Card de un ticket" width="300"/>
+<img src="branch-client/public/docs/card.png" alt="Card de un ticket" width="270"/>
 
 <sub><b>La card de un ticket</b></sub>
 
@@ -76,29 +86,9 @@ La IA **planifica** el ticket, **revisa el PR antes que el líder** y el tablero
 
 # 📊 Informe
 
-<table>
-<tr>
-<td width="50%"><img src="branch-client/public/docs/readme/capa-2.svg" width="100%" alt="Capa 2: 55,6 % en septiembre, 86,7 % en octubre, meta 80 %"/></td>
-<td width="50%"><img src="branch-client/public/docs/readme/capa-3.svg" width="100%" alt="Capa 3: 0,33 aclaraciones por PR en septiembre, 0,07 en octubre"/></td>
-</tr>
-<tr>
-<td valign="top"><img src="branch-client/public/docs/readme/proyectos.svg" width="100%" alt="Aprobados a la primera por proyecto"/></td>
-<td valign="top">
+<img src="branch-client/public/docs/readme/capas.svg" width="100%" alt="Capa 2: de 55,6 % a 86,7 % con meta 80 %. Capa 3: de 0,33 a 0,07 aclaraciones por PR"/>
 
-#### 🆚 3 entregas comparadas
-
-| ★ Septiembre | Octubre |
-|---|---|
-| 🟥 unbosque #110 · 1 aclaración | 🟩 redsalud #1994 · 0 |
-| 🟥 unbosque #120 · 1 aclaración | 🟩 redsalud #1992 · 0 |
-| 🟥 unisabana #409 · 1 aclaración | 🟩 redsalud #1981 · 0 |
-| **3 aclaraciones** | **0 aclaraciones** |
-
-<sub>Septiembre sin pr-review · octubre con pr-review.</sub>
-
-</td>
-</tr>
-</table>
+<img src="branch-client/public/docs/readme/detalle.svg" width="100%" alt="Aprobados por proyecto y 3 entregas comparadas: 3 aclaraciones en septiembre, 0 en octubre"/>
 
 ### 🤖 Uso de la IA
 
