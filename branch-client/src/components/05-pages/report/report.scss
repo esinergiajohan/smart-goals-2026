@@ -106,7 +106,7 @@
   &__content {
     display: flex;
     flex-direction: column;
-    gap: $space-10;
+    gap: 4rem;
     margin-top: $space-8;
   }
 
@@ -199,6 +199,66 @@
     h3 {
       margin-top: $space-2;
       font-size: $font-size-md;
+    }
+  }
+
+  &__step {
+    margin-right: $space-2;
+    color: var(--report-series);
+    font-family: $font-family-mono;
+  }
+
+  &__layer {
+    margin-left: $space-3;
+    padding: 2px $space-2;
+    border: 1px solid var(--report-good);
+    border-radius: $radius-pill;
+    color: var(--report-good);
+    font-size: $font-size-xs;
+    vertical-align: middle;
+
+    &--muted {
+      border-color: var(--report-muted);
+      color: var(--report-muted);
+    }
+  }
+
+  &__delta {
+    color: var(--report-good);
+    font-weight: $font-weight-semibold;
+  }
+
+  &__panels {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+    gap: $space-4;
+  }
+
+  &__panel {
+    padding: $space-5;
+    border: 1px solid var(--report-border);
+    border-radius: $radius-md;
+    background: var(--report-surface);
+  }
+
+  &__heatmap {
+    th[scope='row'] {
+      color: var(--report-ink);
+      font-size: $font-size-sm;
+      text-transform: none;
+    }
+  }
+
+  &__heat {
+    text-align: center !important;
+
+    strong {
+      display: block;
+    }
+
+    span {
+      color: var(--report-muted);
+      font-size: $font-size-xs;
     }
   }
 

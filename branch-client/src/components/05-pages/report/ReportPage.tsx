@@ -86,6 +86,56 @@ const downloadPdf = async (root: HTMLElement) => {
   pdf.save('informe-objetivos-2026.pdf')
 }
 
+function ProjectHeatmap({ months }: { months: ReportPeriod[] }) {
+  const projects = [...new Set(months.flatMap((period) => period.deliveries.map((item) => item.repository)))].sort()
+  const cell = (period: ReportPeriod, project: string) => {
+    const closed = period.deliveries.filter((item) => item.repository === project && item.firstAttempt !== null)
+    const ok = closed.filter((item) => item.firstAttempt).length
+    return closed.length ? { rate: ok / closed.length, label: `${ok}/${closed.length}` } : null
+  }
+  return (
+    <table className="report__table report__heatmap">
+      <caption>PR aprobados a la primera por proyecto</caption>
+      <thead>
+        <tr>
+          <th scope="col">Proyecto</th>
+          {REPORT_MONTHS.map((month) => (
+            <th key={month.label} scope="col">
+              {month.baseline ? `★ ${month.label}` : month.label}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {projects.map((project) => (
+          <tr key={project}>
+            <th scope="row">{project}</th>
+            {months.map((period, index) => {
+              const value = cell(period, project)
+              return (
+                <td
+                  key={REPORT_MONTHS[index].label}
+                  className="report__heat"
+                  style={value ? { backgroundColor: `rgba(16, 185, 129, ${(0.12 + value.rate * 0.55).toFixed(2)})` } : undefined}
+                >
+                  {value ? (
+                    <>
+                      <strong>{formatRate(value.rate)}</strong>
+                      <span>{value.label}</span>
+                    </>
+                  ) : (
+                    <span>—</span>
+                  )}
+                </td>
+              )
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
+}
+
 function Result({ item }: { item: ReportDelivery }) {
   if (item.firstAttempt === true) return <span className="report__badge report__badge--good">✓ A la primera</span>
   if (item.firstAttempt === null) return <span className="report__badge">Abierto</span>
@@ -236,6 +286,9 @@ export function ReportPage() {
             <article className={`report__tile ${rateReached ? 'report__tile--good' : ''}`}>
               <h2>PR aprobados sin retrabajo</h2>
               <p className="report__big">{formatRate(goal.metrics.rate)}</p>
+              <p className="report__delta">
+                ▲ +{(((goal.metrics.rate ?? 0) - (baseline.metrics.rate ?? 0)) * 100).toFixed(1)} pp frente a ★ septiembre
+              </p>
               <p>
                 {goal.metrics.firstAttempt} de {goal.metrics.closed} PR de octubre a hoy · meta 80 %
               </p>
@@ -244,6 +297,7 @@ export function ReportPage() {
             <article className={`report__tile ${clarificationReached ? 'report__tile--good' : ''}`}>
               <h2>Aclaraciones del líder</h2>
               <p className="report__big">−{formatRate(clarificationDrop)}</p>
+              <p className="report__delta">▼ de {perPr(baseline)?.toFixed(2)} a {perPr(goal)?.toFixed(2)} por PR</p>
               <p>
                 De {perPr(baseline)?.toFixed(2)} a {perPr(goal)?.toFixed(2)} aclaraciones por PR · meta −80 %
               </p>
@@ -258,8 +312,13 @@ export function ReportPage() {
           </section>
 
           <section className="report__section">
-            <h2>1. PR de Git aprobados sin retrabajo</h2>
+            <h2>
+              <span className="report__step">01</span> PR de Git aprobados sin retrabajo
+              <span className="report__layer">Capa 2</span>
+            </h2>
             <p className="report__goal">{GOAL_CAPA_2}</p>
+            <div className="report__panels">
+              <div className="report__panel">
             <BarChart
               title="PR aprobados a la primera, por mes"
               max={1}
@@ -273,6 +332,11 @@ export function ReportPage() {
                 highlight: REPORT_MONTHS[index].baseline,
               }))}
             />
+              </div>
+              <div className="report__panel">
+                <ProjectHeatmap months={months} />
+              </div>
+            </div>
             <p className="report__legend">★ Septiembre es la línea base: trabajo sin pr-review.</p>
             <h3>Observaciones</h3>
             <ul className="report__list">
@@ -298,7 +362,10 @@ export function ReportPage() {
           </section>
 
           <section className="report__section">
-            <h2>2. Revisión previa de PR con pr-review de esinergia y una IA</h2>
+            <h2>
+              <span className="report__step">02</span> Revisión previa de PR con pr-review de esinergia y una IA
+              <span className="report__layer">Capa 3</span>
+            </h2>
             <p className="report__goal">{GOAL_CAPA_3}</p>
             <BarChart
               title="Aclaraciones del líder por PR, por mes"
@@ -347,7 +414,10 @@ export function ReportPage() {
           </section>
 
           <section className="report__section">
-            <h2>3. Biblioteca de conocimiento de Site Studio</h2>
+            <h2>
+              <span className="report__step">03</span> Biblioteca de conocimiento de Site Studio
+              <span className="report__layer report__layer--muted">Capa 1</span>
+            </h2>
             <p className="report__goal">{GOAL_CAPA_1}</p>
             <h3>Observaciones</h3>
             <ul className="report__list">
