@@ -43,7 +43,13 @@ export function ConfirmDialog({
         if (event.target === event.currentTarget) onCancel()
       }}
     >
-      <div className="confirm-dialog__panel">
+      <form
+        className="confirm-dialog__panel"
+        onSubmit={(event) => {
+          event.preventDefault()
+          onConfirm()
+        }}
+      >
         <h2 id={titleId} className="confirm-dialog__title">
           {title}
         </h2>
@@ -52,11 +58,11 @@ export function ConfirmDialog({
         </div>
         <div className="confirm-dialog__actions">
           <Button onClick={onCancel}>Cancelar</Button>
-          <Button variant={confirmVariant} onClick={onConfirm}>
+          <Button type="submit" variant={confirmVariant}>
             {confirmLabel}
           </Button>
         </div>
-      </div>
+      </form>
     </dialog>
   )
 }

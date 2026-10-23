@@ -1,0 +1,91 @@
+@use '../../00-base' as *;
+
+.release-card {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  padding: $space-5 $space-6;
+  border: 2px solid $color-branch-release;
+  border-radius: $radius-lg;
+  background: linear-gradient(160deg, rgb(192 132 252 / 0.1), $color-surface 45%);
+  box-shadow:
+    0 0 0 1px rgb(192 132 252 / 0.2),
+    0 0 24px rgb(192 132 252 / 0.12);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  &__tag {
+    padding: $space-1 $space-2;
+    border-radius: $radius-sm;
+    background: $color-branch-release;
+    color: $color-bg;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  &__repo {
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+  }
+
+  &__refresh {
+    margin-left: auto;
+  }
+
+  &__title {
+    overflow-wrap: anywhere;
+    color: $color-text;
+    font-family: $font-family-mono;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+  }
+
+  &__alert {
+    padding: $space-2 $space-3;
+    border: 1px solid $color-danger-border;
+    border-radius: $radius-md;
+    background: $color-danger-bg;
+    color: $color-danger;
+    font-size: $font-size-sm;
+  }
+
+  &__loading {
+    padding: $space-6 $space-4;
+    border: 1px dashed $color-border-strong;
+    border-radius: $radius-md;
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+    text-align: center;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: center;
+    padding-top: $space-3;
+    border-top: 1px solid rgb(192 132 252 / 0.35);
+  }
+
+  &__pending {
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+    text-align: center;
+  }
+
+  &__label {
+    color: $color-text;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &__error {
+    color: $color-danger;
+  }
+}

@@ -25,6 +25,11 @@
     max-width: $container-search;
   }
 
+  &__legend {
+    padding: $space-3 $space-4;
+    border-bottom: 1px solid $color-border;
+  }
+
   &__nav {
     display: flex;
     gap: $space-2;
@@ -67,7 +72,7 @@
     padding: $space-8 $space-4;
 
     @media (min-width: $breakpoint-wide) {
-      grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(0, 0.75fr);
+      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 0.7fr);
     }
   }
 }

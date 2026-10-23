@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { DashboardTemplate } from './components/04-templates/dashboard/DashboardTemplate.tsx'
+import { ReleaseLegend } from './components/02-molecules/release-legend/ReleaseLegend.tsx'
 import { DeliveryMetrics } from './components/03-organisms/delivery-metrics/DeliveryMetrics.tsx'
 import { ActiveTicketColumn } from './components/03-organisms/active-ticket-column/ActiveTicketColumn.tsx'
 import { TicketColumn } from './components/03-organisms/ticket-column/TicketColumn.tsx'
@@ -8,6 +9,7 @@ import { useActiveTickets } from './hooks/useActiveTickets.ts'
 import { useRepositories } from './hooks/useRepositories.ts'
 import { useTicketStatuses } from './hooks/useTicketStatuses.ts'
 import { useTicketCards } from './hooks/useTicketCards.ts'
+import { groupReleases } from './utils/releases.ts'
 
 function App() {
   const {
@@ -19,12 +21,14 @@ function App() {
     setDeployed,
     setBranches,
     setFeaturedComment,
+    setClosure,
     setRepository,
   } = useTicketCards()
   const { repositories, addRepository } = useRepositories()
   const active = useActiveTickets()
   const statuses = useTicketStatuses([...pendingCards, ...deployedCards].map((card) => card.key))
   const [movedKey, setMovedKey] = useState<string>()
+  const hasReleases = [pendingCards, deployedCards].some((cards) => groupReleases(cards).length > 0)
 
   const handleDeployChange = (key: string, deployed: boolean) => {
     setDeployed(key, deployed)
@@ -35,6 +39,7 @@ function App() {
     <DashboardTemplate
       title="Jira Smart Project"
       search={<TicketSearch onSelect={addCard} />}
+      legend={hasReleases && <ReleaseLegend />}
       summary={<DeliveryMetrics />}
     >
       <TicketColumn
@@ -50,6 +55,7 @@ function App() {
         onDeployChange={handleDeployChange}
         onBranchesChange={setBranches}
         onFeaturedCommentChange={setFeaturedComment}
+        onClosureChange={setClosure}
         onRepositoryChange={setRepository}
         onAddRepository={addRepository}
       />
@@ -65,6 +71,7 @@ function App() {
         onDeployChange={handleDeployChange}
         onBranchesChange={setBranches}
         onFeaturedCommentChange={setFeaturedComment}
+        onClosureChange={setClosure}
         onRepositoryChange={setRepository}
         onAddRepository={addRepository}
       />

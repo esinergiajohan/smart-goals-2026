@@ -9,6 +9,7 @@ import { HttpError, sendJson } from './http.ts'
 import { createJiraRoutes } from './jira-api.ts'
 import { createPlanRunner } from './plan-runner.ts'
 import { createPlansHandler, PLANS_ROUTE } from './plans-api.ts'
+import { createReleasesHandlers, RELEASE_GRAPH_ROUTE, RELEASES_ROUTE } from './releases-api.ts'
 import { createReportHandler, REPORT_ROUTE } from './report-api.ts'
 import {
   createPullRequestsHandlers,
@@ -46,6 +47,7 @@ const reviewConfig = {
 const reviewRunner = createReviewRunner(db, reviewConfig)
 const reviewsHandler = createReviewsHandler(db, reviewRunner)
 const plansHandler = createPlansHandler(db, createPlanRunner(db, reviewConfig), process.env)
+const releasesHandlers = createReleasesHandlers(db)
 const pullRequestsHandlers = createPullRequestsHandlers(db, {
   bitbucketEnvFile: process.env.BITBUCKET_ENV_FILE ?? '/Volumes/KINGSTON/7777/gitHub/bitbucket-mvp/.env',
 })
@@ -74,6 +76,8 @@ const server = createServer(async (req, res) => {
     if (pathname === PULL_REQUESTS_ROUTE) return await pullRequestsHandlers.pullRequests(req, res)
     if (pathname === PULL_REQUESTS_SYNC_ROUTE) return await pullRequestsHandlers.sync(req, res)
     if (pathname === PLANS_ROUTE || pathname.startsWith(`${PLANS_ROUTE}/`)) return await plansHandler(req, res, pathname)
+    if (pathname === RELEASES_ROUTE) return await releasesHandlers.releases(req, res)
+    if (pathname === RELEASE_GRAPH_ROUTE) return await releasesHandlers.graph(req, res)
     if (pathname === REPORT_ROUTE) return await createReportHandler(db)(req, res)
     if (pathname === METRICS_ROUTE) return await pullRequestsHandlers.metrics(req, res)
 

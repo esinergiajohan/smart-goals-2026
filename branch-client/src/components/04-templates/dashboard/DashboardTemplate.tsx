@@ -4,11 +4,12 @@ import './dashboard.scss'
 interface DashboardTemplateProps {
   title: string
   search: ReactNode
+  legend?: ReactNode
   summary?: ReactNode
   children: ReactNode
 }
 
-export function DashboardTemplate({ title, search, summary, children }: DashboardTemplateProps) {
+export function DashboardTemplate({ title, search, legend, summary, children }: DashboardTemplateProps) {
   return (
     <div className="dashboard">
       <header className="dashboard__header">
@@ -23,6 +24,7 @@ export function DashboardTemplate({ title, search, summary, children }: Dashboar
           </a>
         </nav>
       </header>
+      {legend && <div className="dashboard__legend">{legend}</div>}
       {summary && <div className="dashboard__summary">{summary}</div>}
       <main className="dashboard__content">{children}</main>
     </div>

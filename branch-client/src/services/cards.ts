@@ -4,6 +4,7 @@ import type { JiraTicket, TicketBranches, TrackedTicket } from '../types/jira.ts
 export interface CardChanges {
   deployedAt?: string | null
   featuredCommentId?: string | null
+  closureCommentUrl?: string | null
   branches?: Partial<TicketBranches>
   repositoryId?: number | null
 }

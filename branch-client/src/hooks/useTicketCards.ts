@@ -96,6 +96,14 @@ export function useTicketCards() {
     [persist],
   )
 
+  const setClosure = useCallback(
+    (key: string, closureCommentUrl: string | undefined) => {
+      setCards((current) => current.map((card) => (card.key === key ? { ...card, closureCommentUrl } : card)))
+      persist(updateCard(key, { closureCommentUrl: closureCommentUrl ?? null }))
+    },
+    [persist],
+  )
+
   const setBranches = useCallback(
     (key: string, branches: Partial<TicketBranches>) => {
       setCards((current) =>
@@ -128,6 +136,7 @@ export function useTicketCards() {
     setDeployed,
     setBranches,
     setFeaturedComment,
+    setClosure,
     setRepository,
   }
 }

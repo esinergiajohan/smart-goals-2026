@@ -3,7 +3,9 @@ import { parseArgs } from 'node:util'
 import type { JiraTicket, TicketBranches, TrackedTicket } from '../src/types/jira.ts'
 import type { Plan } from '../src/types/plan.ts'
 import type { Delivery, DeliveryMetrics } from '../src/types/pullRequest.ts'
+import type { ReleaseGraph, ReleaseGroup } from '../src/types/release.ts'
 import type { Repository, Review } from '../src/types/review.ts'
+import { mixedBranches, releaseFamily } from '../src/utils/releases.ts'
 import { BASELINE_PERIOD, FIRST_ATTEMPT_TARGET, formatRate, GOAL_PERIOD } from '../src/utils/goals.ts'
 
 const API = `http://127.0.0.1:${process.env.BRANCH_SERVER_PORT ?? 8787}/api`
@@ -24,6 +26,9 @@ Uso: bm <comando> [opciones] [--json]
                [--release true|false] [--merged r1,r2] [--deployed true|false]
                [--comment ID|none]
   card rm KEY
+  releases                                 Releases compartidas por varias cards (misma rama de trabajo con Release)
+  release RAMA [--repo NOMBRE|ID]          Ramas unidas a la release (merge o cherry-pick), de dónde se cortó cada una
+                                           y commits por ticket
   reviews KEY                              Historial de revisiones de la card
   review KEY [--wait]                      PR simulado: pr-review + Claude sobre <rama de trabajo>-test
                                            contra la rama de producción del repo
@@ -178,6 +183,25 @@ const describePlan = (plan: Plan) => {
 const latestPlan = async (key: string) => {
   const { plans } = await request<{ plans: Plan[] }>(`/plans?${new URLSearchParams({ ticket: key })}`)
   return plans[plans.length - 1]
+}
+
+const describeRelease = (graph: ReleaseGraph) => {
+  const branches = graph.branches.filter((branch) => branch.method !== 'sync')
+  const syncs = graph.branches.length - branches.length
+  const mixed = mixedBranches(graph)
+  return [
+    `${graph.branch} (${graph.ref}) · ${graph.commits} commits sobre ${graph.production}`,
+    `  base: ${graph.base.sha} ${graph.base.subject}${syncs ? ` · sincronizada con ${graph.production} ${syncs} ${syncs === 1 ? 'vez' : 'veces'}` : ''}`,
+    mixed.length
+      ? `  ✗ mezcla de bases (release familia ${releaseFamily(graph)}): ${mixed.map((branch) => `${branch.name} [${branch.origin}]`).join(', ')}`
+      : `  bases: todas de la familia ${releaseFamily(graph)}`,
+    'Ramas:',
+    ...branches.map(
+      (branch) =>
+        `  ${branch.origin === 'main' ? '★' : branch.origin === 'release' ? '·' : '✗'} ${branch.origin.padEnd(7)} ${branch.method.padEnd(11)} ${branch.joined}/${branch.commits}\t${branch.name}${branch.ticketKey ? ` [${branch.ticketKey}]` : ''}${branch.pullRequest ? ` PR #${branch.pullRequest}` : ''}`,
+    ),
+    `Tickets: ${graph.tickets.map((ticket) => `${ticket.key}(${ticket.commits})`).join(' ')}`,
+  ].join('\n')
 }
 
 const commands: Record<string, (args: string[]) => Promise<number | void>> = {
@@ -348,6 +372,28 @@ const commands: Record<string, (args: string[]) => Promise<number | void>> = {
       ].join('\n'),
       results,
     )
+  },
+
+  async releases() {
+    const { releases } = await request<{ releases: Array<ReleaseGroup & { repositoryName?: string }> }>('/releases')
+    print(
+      releases
+        .map((item) => `${item.repositoryName ?? item.repositoryId}\t${item.branch}\t${item.ticketKeys.join(',')}`)
+        .join('\n') || 'No hay releases compartidas por varias cards.',
+      releases,
+    )
+  },
+
+  async release([branch]) {
+    if (!branch) throw new CliError('Uso: bm release RAMA [--repo NOMBRE|ID]')
+    const { releases } = await request<{ releases: ReleaseGroup[] }>('/releases')
+    const repositoryId = options.repo
+      ? (await findRepository(options.repo)).id
+      : releases.find((item) => item.branch === branch)?.repositoryId
+    if (!repositoryId) throw new CliError(`Ninguna release agrupa la rama «${branch}». Indica el repositorio con --repo.`)
+    const params = new URLSearchParams({ repositoryId: String(repositoryId), branch })
+    const { graph } = await request<{ graph: ReleaseGraph }>(`/releases/graph?${params}`)
+    print(describeRelease(graph), graph)
   },
 
   async reviews([rawKey]) {

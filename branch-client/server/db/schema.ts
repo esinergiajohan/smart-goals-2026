@@ -22,6 +22,7 @@ export const tickets = sqliteTable('tickets', {
   addedAt: text('added_at').notNull(),
   deployedAt: text('deployed_at'),
   featuredCommentId: text('featured_comment_id'),
+  closureCommentUrl: text('closure_comment_url'),
   branches: text('branches', { mode: 'json' }).$type<Partial<TicketBranches>>(),
   repositoryId: integer('repository_id').references(() => repositories.id, { onDelete: 'set null' }),
 })

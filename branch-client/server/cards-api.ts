@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { desc, eq } from 'drizzle-orm'
 import type { JiraTicket, TicketBranches, TrackedTicket } from '../src/types/jira.ts'
+import { parseCommentUrl } from '../src/utils/commentUrl.ts'
 import type { Db } from './db/client.ts'
 import { repositories, tickets } from './db/schema.ts'
 import { HttpError, readJson, sendJson } from './http.ts'
@@ -63,6 +64,11 @@ const parseCommentId = (value: unknown) => {
   return COMMENT_ID.test(id) ? id : invalid('featuredCommentId')
 }
 
+const parseClosureUrl = (value: unknown, key: string) => {
+  const url = parseText(value, 'closureCommentUrl').trim()
+  return parseCommentUrl(url)?.key === key ? url : invalid('closureCommentUrl')
+}
+
 const parseRepositoryId = (db: Db, value: unknown) => {
   const id = typeof value === 'number' && Number.isInteger(value) ? value : invalid('repositoryId')
   if (!db.select().from(repositories).where(eq(repositories.id, id)).get()) invalid('repositoryId')
@@ -86,6 +92,7 @@ const parseTrackedTicket = (value: unknown): TrackedTicket => {
     ...ticket,
     deployedAt: parseOptional(source.deployedAt, (date) => parseDate(date, 'deployedAt')) ?? undefined,
     featuredCommentId: parseOptional(source.featuredCommentId, parseCommentId) ?? undefined,
+    closureCommentUrl: parseOptional(source.closureCommentUrl, (url) => parseClosureUrl(url, ticket.key)) ?? undefined,
     branches: parseOptional(source.branches, parseBranches) ?? undefined,
   }
 }
@@ -97,6 +104,7 @@ const toCard = ({
   updated,
   deployedAt,
   featuredCommentId,
+  closureCommentUrl,
   branches,
   repositoryId,
 }: TicketRow): TrackedTicket => ({
@@ -106,6 +114,7 @@ const toCard = ({
   updated,
   ...(deployedAt && { deployedAt }),
   ...(featuredCommentId && { featuredCommentId }),
+  ...(closureCommentUrl && { closureCommentUrl }),
   ...(branches && { branches }),
   ...(repositoryId && { repositoryId }),
 })
@@ -160,6 +169,9 @@ const updateCard = async (db: Db, key: string, req: IncomingMessage) => {
   }
   if (body.featuredCommentId !== undefined) {
     changes.featuredCommentId = parseOptional(body.featuredCommentId, parseCommentId)
+  }
+  if (body.closureCommentUrl !== undefined) {
+    changes.closureCommentUrl = parseOptional(body.closureCommentUrl, (url) => parseClosureUrl(url, key))
   }
   if (body.branches !== undefined) {
     changes.branches = { ...current.branches, ...parseBranches(body.branches) }

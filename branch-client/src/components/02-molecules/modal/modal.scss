@@ -1,0 +1,46 @@
+@use '../../00-base' as *;
+
+.modal {
+  width: min(44rem, calc(100% - #{$space-8}));
+  max-height: calc(100dvh - #{$space-8});
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid $color-branch-release;
+  border-radius: $radius-lg;
+  background: $color-surface;
+  color: $color-text;
+  box-shadow: 0 24px 64px rgb(0 0 0 / 0.6);
+
+  &[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &::backdrop {
+    background: rgb(0 0 0 / 0.7);
+    backdrop-filter: blur(2px);
+  }
+
+  &__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-3;
+    padding: $space-3 $space-5;
+    border-bottom: 1px solid rgb(192 132 252 / 0.35);
+  }
+
+  &__title {
+    color: $color-branch-release;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &__body {
+    padding: $space-5;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}

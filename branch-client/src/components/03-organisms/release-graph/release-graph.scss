@@ -1,0 +1,321 @@
+@use '../../00-base' as *;
+
+$release-graph-tones: (
+  'main': $color-emerald-400,
+  'release': $color-branch-release,
+  'staging': $color-danger,
+  'develop': $color-danger,
+);
+
+$release-graph-status: (
+  'open': $color-accent,
+  'progress': $color-amber-400,
+  'blocked': $color-danger-solid,
+  'done': $color-emerald-400,
+  'unknown': $color-text-subtle,
+);
+
+$release-graph-edges: (
+  'main': $color-emerald-400,
+  'release': $color-branch-release,
+  'alert': $color-danger,
+  'pending': $color-text-subtle,
+);
+
+@keyframes release-graph-flow {
+  to {
+    stroke-dashoffset: -12;
+  }
+}
+
+@keyframes release-graph-chevron {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes release-graph-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.release-graph {
+  margin: 0;
+  padding: $space-3;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  background: $color-bg;
+
+  &__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  &__box {
+    fill: $color-surface-raised;
+    stroke-width: 1.5;
+  }
+
+  &__role {
+    font-size: 9px;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &__name {
+    fill: $color-text;
+    font-family: $font-family-mono;
+    font-size: 11px;
+  }
+
+  &__edge {
+    fill: none;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+
+    &--main {
+      stroke-width: 3;
+      filter: drop-shadow(0 0 4px rgb(52 211 153 / 0.55));
+    }
+
+    &--alert {
+      stroke-width: 2.5;
+    }
+
+    &--cherry-pick {
+      stroke-width: 1;
+      stroke-opacity: 0.35;
+      filter: none;
+    }
+
+    &--direct {
+      stroke-width: 3.5;
+      stroke-dasharray: 3.5 3;
+      stroke-linecap: butt;
+      animation: release-graph-flow 900ms linear infinite;
+    }
+
+    &--pending {
+      stroke-width: 2;
+      stroke-dasharray: 0.1 5;
+    }
+  }
+
+  &__chevron {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: release-graph-chevron 1.2s ease-in-out infinite;
+  }
+
+  @each $tone, $color in $release-graph-edges {
+    &__edge--#{$tone} {
+      stroke: $color;
+    }
+
+    &__arrow--#{$tone} {
+      fill: $color;
+    }
+
+    &__link--#{$tone} {
+      color: $color;
+    }
+  }
+
+  @each $tone, $color in $release-graph-tones {
+    &__node--#{$tone} &__box {
+      stroke: $color;
+    }
+
+    &__node--#{$tone} &__role,
+    &__node--#{$tone} &__dot {
+      fill: $color;
+    }
+  }
+
+  &__node--main &__box {
+    fill: $color-emerald-950;
+    stroke-width: 2;
+  }
+
+  &__node--staging &__box,
+  &__node--develop &__box {
+    fill: $color-danger-bg;
+    stroke-width: 2;
+  }
+
+  &__node--pending &__box,
+  &__node--pending &__dot,
+  &__node--pending &__role,
+  &__node--pending &__name {
+    opacity: 0.55;
+  }
+
+  &__node--missing &__box {
+    stroke: $color-border-strong;
+    stroke-dasharray: 4 3;
+  }
+
+  &__node--missing &__role,
+  &__node--missing &__dot {
+    fill: $color-text-subtle;
+  }
+
+  &__node--interactive {
+    cursor: pointer;
+    outline: none;
+
+    .release-graph__box {
+      transition:
+        fill $transition-fast,
+        stroke $transition-fast;
+    }
+
+    &:hover .release-graph__box {
+      stroke: $color-branch-release;
+    }
+
+    &:focus-visible .release-graph__box {
+      stroke: $color-focus;
+      stroke-width: 3;
+    }
+  }
+
+  &__node--selected .release-graph__box {
+    stroke: $color-branch-release;
+    stroke-width: 2.5;
+  }
+
+  &__status {
+    rect {
+      fill: currentColor;
+      fill-opacity: 0.16;
+      stroke: currentColor;
+      stroke-width: 1;
+    }
+
+    text {
+      fill: currentColor;
+      font-size: 8px;
+      font-weight: $font-weight-bold;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+  }
+
+  @each $tone, $color in $release-graph-status {
+    &__status--#{$tone} {
+      color: $color;
+    }
+  }
+
+  &__commits {
+    fill: $color-text-muted;
+    font-size: 9.5px;
+  }
+
+  &__release-frame {
+    stroke: $color-branch-release;
+    stroke-width: 2;
+  }
+
+  &__release-strip {
+    fill: $color-branch-release;
+  }
+
+  &__release-text {
+    fill: $color-bg;
+    font-size: 9px;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  &__release-name {
+    fill: $color-text;
+    font-family: $font-family-mono;
+    font-size: 9px;
+    font-weight: $font-weight-bold;
+  }
+
+  &__release-base {
+    fill: $color-emerald-300;
+    font-family: $font-family-mono;
+    font-size: 9px;
+  }
+
+  &__release-meta {
+    fill: $color-text-muted;
+    font-size: 9px;
+  }
+
+  &__closure {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-2;
+    height: 100%;
+    border-top: 1px solid $color-border;
+
+    .switch__label {
+      font-size: 0.5625rem;
+    }
+
+    .switch--on {
+      color: $color-emerald-400;
+    }
+
+    .switch--on .switch__track {
+      background: $color-emerald-400;
+    }
+  }
+
+  &__closure-link {
+    color: $color-emerald-300;
+    font-size: 0.625rem;
+    white-space: nowrap;
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+
+  &__hint {
+    fill: $color-text-subtle;
+    font-size: 10px;
+    font-style: italic;
+  }
+
+  &__node,
+  &__release {
+    animation: release-graph-fade 300ms ease-out both;
+  }
+
+  &__release {
+    filter: drop-shadow(0 0 10px rgb(192 132 252 / 0.4));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__node,
+    &__release,
+    &__edge,
+    &__chevron {
+      animation: none;
+    }
+  }
+}

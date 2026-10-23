@@ -8,6 +8,7 @@ export interface JiraTicket {
 export interface TrackedTicket extends JiraTicket {
   deployedAt?: string
   featuredCommentId?: string
+  closureCommentUrl?: string
   branches?: Partial<TicketBranches>
   repositoryId?: number
 }

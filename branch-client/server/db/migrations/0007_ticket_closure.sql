@@ -1,0 +1,1 @@
+ALTER TABLE `tickets` ADD `closure_comment_url` text;
