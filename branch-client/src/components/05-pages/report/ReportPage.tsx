@@ -148,6 +148,32 @@ export function ReportPage() {
 
       {ready && baseline && goal && usage && (
         <main className="report__content">
+          <section className="report__highlight" aria-labelledby="report-highlight-title">
+            <p className="report__highlight-count">
+              {[rateReached, clarificationReached].filter(Boolean).length} de 3
+            </p>
+            <div>
+              <h2 id="report-highlight-title" className="report__highlight-title">
+                {rateReached && clarificationReached
+                  ? 'Dos objetivos cumplidos'
+                  : `${[rateReached, clarificationReached].filter(Boolean).length} objetivo(s) cumplido(s)`}
+              </h2>
+              <ul className="report__highlight-list">
+                <li>
+                  {rateReached ? '✓' : '…'} <strong>Capa 2 · PR aprobados sin retrabajo:</strong>{' '}
+                  {formatRate(goal.metrics.rate)} (meta 80 %).
+                </li>
+                <li>
+                  {clarificationReached ? '✓' : '…'} <strong>Capa 3 · Revisión previa con pr-review e IA:</strong>{' '}
+                  {clarificationDrop !== null ? `−${formatRate(clarificationDrop)}` : '—'} en aclaraciones del líder (meta −80 %).
+                </li>
+                <li>
+                  · <strong>Capa 1 · Biblioteca de Site Studio:</strong> se reporta aparte.
+                </li>
+              </ul>
+            </div>
+          </section>
+
           <section className="report__summary" aria-label="Resumen">
             <article className={`report__tile ${rateReached ? 'report__tile--good' : ''}`}>
               <h2>PR aprobados sin retrabajo</h2>

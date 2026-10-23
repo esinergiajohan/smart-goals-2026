@@ -81,6 +81,40 @@
     margin-top: $space-8;
   }
 
+  &__highlight {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-4 $space-8;
+    padding: $space-6;
+    border: 2px solid var(--report-good);
+    border-radius: $radius-lg;
+    background: var(--report-surface);
+  }
+
+  &__highlight-count {
+    color: var(--report-good);
+    font-size: 3.5rem;
+    font-weight: $font-weight-bold;
+    line-height: 1;
+  }
+
+  &__highlight-title {
+    margin-bottom: $space-2;
+    color: var(--report-good);
+    font-size: 1.5rem;
+  }
+
+  &__highlight-list {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    line-height: 1.6;
+  }
+
   &__summary {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
