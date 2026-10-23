@@ -12,9 +12,43 @@
     background: $color-bg;
   }
 
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: $space-3 $space-6;
+  }
+
   &__search {
+    flex: 1 1 24rem;
     max-width: $container-search;
-    margin-inline: auto;
+  }
+
+  &__nav {
+    display: flex;
+    gap: $space-2;
+  }
+
+  &__link {
+    padding: $space-2 $space-4;
+    border: 1px solid $color-border-strong;
+    border-radius: $radius-sm;
+    background: $color-surface-raised;
+    color: $color-text;
+    font-size: $font-size-sm;
+    text-decoration: none;
+
+    &--primary {
+      border-color: $color-emerald-400;
+      background: $color-emerald-400;
+      color: $color-emerald-950;
+      font-weight: $font-weight-bold;
+    }
+
+    &:focus-visible {
+      @include focus-ring;
+    }
   }
 
   &__summary {

@@ -1,0 +1,55 @@
+@use '../../00-base' as *;
+
+.bar-chart {
+  margin: 0;
+
+  &__title {
+    margin-bottom: $space-2;
+    color: var(--report-muted);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    max-width: 560px;
+    height: auto;
+  }
+
+  &__axis {
+    stroke: var(--report-border);
+    stroke-width: 1;
+  }
+
+  &__bar {
+    fill: var(--report-series);
+
+    &--met {
+      fill: var(--report-good);
+    }
+
+    &--baseline {
+      fill: var(--report-baseline);
+    }
+  }
+
+  &__value {
+    fill: var(--report-ink);
+    font-size: 15px;
+    font-weight: $font-weight-bold;
+  }
+
+  &__label,
+  &__empty,
+  &__target-label {
+    fill: var(--report-muted);
+    font-size: 13px;
+  }
+
+  &__target {
+    stroke: var(--report-target);
+    stroke-width: 2;
+    stroke-dasharray: 6 4;
+  }
+}

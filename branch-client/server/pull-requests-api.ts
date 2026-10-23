@@ -193,6 +193,7 @@ export const createPullRequestsHandlers = (db: Db, settings: ProviderSettings) =
         reviewerComments: delivery.reviewerComments,
         reviewers: delivery.reviewers,
         pullRequests: delivery.pullRequests.map((pullRequest) => `#${pullRequest.externalId} ${pullRequest.state}`),
+        url: delivery.pullRequests[0].url,
       }))
     return sendJson(res, 200, { metrics: toMetrics(deliveries, from, to), deliveries: detail })
   }

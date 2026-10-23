@@ -14,6 +14,14 @@ export function DashboardTemplate({ title, search, summary, children }: Dashboar
       <header className="dashboard__header">
         <h1 className="visually-hidden">{title}</h1>
         <div className="dashboard__search">{search}</div>
+        <nav className="dashboard__nav" aria-label="Páginas">
+          <a className="dashboard__link dashboard__link--primary" href="/informe">
+            Informe
+          </a>
+          <a className="dashboard__link" href="/documentacion">
+            Documentación
+          </a>
+        </nav>
       </header>
       {summary && <div className="dashboard__summary">{summary}</div>}
       <main className="dashboard__content">{children}</main>

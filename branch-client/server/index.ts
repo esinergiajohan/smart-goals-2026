@@ -9,6 +9,7 @@ import { HttpError, sendJson } from './http.ts'
 import { createJiraRoutes } from './jira-api.ts'
 import { createPlanRunner } from './plan-runner.ts'
 import { createPlansHandler, PLANS_ROUTE } from './plans-api.ts'
+import { createReportHandler, REPORT_ROUTE } from './report-api.ts'
 import {
   createPullRequestsHandlers,
   METRICS_ROUTE,
@@ -73,6 +74,7 @@ const server = createServer(async (req, res) => {
     if (pathname === PULL_REQUESTS_ROUTE) return await pullRequestsHandlers.pullRequests(req, res)
     if (pathname === PULL_REQUESTS_SYNC_ROUTE) return await pullRequestsHandlers.sync(req, res)
     if (pathname === PLANS_ROUTE || pathname.startsWith(`${PLANS_ROUTE}/`)) return await plansHandler(req, res, pathname)
+    if (pathname === REPORT_ROUTE) return await createReportHandler(db)(req, res)
     if (pathname === METRICS_ROUTE) return await pullRequestsHandlers.metrics(req, res)
 
     throw new HttpError(404, 'Ruta no encontrada.')
