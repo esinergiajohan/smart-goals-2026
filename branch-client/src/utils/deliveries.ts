@@ -9,7 +9,7 @@ const isClean = (pullRequest: PullRequest) =>
 
 export const toDeliveries = (pullRequests: PullRequest[]): Delivery[] => {
   const groups = new Map<string, PullRequest[]>()
-  for (const pullRequest of pullRequests) {
+  for (const pullRequest of pullRequests.filter((item) => !item.selfClosed)) {
     const ticketKey = pullRequest.ticketKey ?? pullRequest.sourceBranch
     const id = `${ticketKey}\u0000${pullRequest.destinationBranch}`
     groups.set(id, [...(groups.get(id) ?? []), pullRequest])
@@ -35,6 +35,12 @@ export const toDeliveries = (pullRequests: PullRequest[]): Delivery[] => {
           ? null
           : ordered.length === 1 && merged === first && isClean(first),
       reworks,
+      reviewerComments: ordered.reduce((total, pullRequest) => total + pullRequest.reviewerComments, 0),
+      reviewers: [
+        ...new Set(
+          ordered.flatMap((pullRequest) => [...pullRequest.approvedBy, ...(pullRequest.mergedBy ? [pullRequest.mergedBy] : [])]),
+        ),
+      ],
       openedAt: first.createdAt,
     }
   })
@@ -44,6 +50,7 @@ export const toMetrics = (deliveries: Delivery[], from: string, to: string): Del
   const inRange = deliveries.filter((delivery) => delivery.openedAt >= from && delivery.openedAt < to)
   const closed = inRange.filter((delivery) => delivery.firstAttempt !== null)
   const firstAttempt = closed.filter((delivery) => delivery.firstAttempt).length
+  const reviewerComments = closed.reduce((total, delivery) => total + delivery.reviewerComments, 0)
 
   return {
     from,
@@ -52,5 +59,7 @@ export const toMetrics = (deliveries: Delivery[], from: string, to: string): Del
     closed: closed.length,
     firstAttempt,
     rate: closed.length ? firstAttempt / closed.length : null,
+    reviewerComments,
+    reviewerCommentsPerDelivery: closed.length ? reviewerComments / closed.length : null,
   }
 }

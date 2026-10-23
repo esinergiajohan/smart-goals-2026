@@ -16,6 +16,9 @@ export interface PullRequest {
   approvedBy: string[]
   changesRequested: number
   pushesAfterOpen: number
+  reviewerComments: number
+  mergedBy?: string
+  selfClosed: boolean
 }
 
 export interface Delivery {
@@ -24,6 +27,8 @@ export interface Delivery {
   pullRequests: PullRequest[]
   firstAttempt: boolean | null
   reworks: number
+  reviewerComments: number
+  reviewers: string[]
   openedAt: string
 }
 
@@ -34,4 +39,6 @@ export interface DeliveryMetrics {
   closed: number
   firstAttempt: number
   rate: number | null
+  reviewerComments: number
+  reviewerCommentsPerDelivery: number | null
 }

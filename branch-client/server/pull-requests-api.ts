@@ -29,6 +29,9 @@ const toPullRequest = (row: PullRequestRow): PullRequest => ({
   approvedBy: row.approvedBy,
   changesRequested: row.changesRequested,
   pushesAfterOpen: row.pushesAfterOpen,
+  reviewerComments: row.reviewerComments,
+  selfClosed: row.selfClosed,
+  ...(row.mergedBy && { mergedBy: row.mergedBy }),
   ...(row.ticketKey && { ticketKey: row.ticketKey }),
   ...(row.closedAt && { closedAt: row.closedAt }),
 })
@@ -70,6 +73,13 @@ export const createPullRequestsHandlers = (db: Db, settings: ProviderSettings) =
           repositoryId,
           ticketKey: ticketKeyFromBranch(pullRequest.sourceBranch) ?? null,
           closedAt: pullRequest.closedAt ?? null,
+          mergedBy: pullRequest.mergedBy ?? null,
+          selfClosed:
+            (pullRequest.state === 'DECLINED' || pullRequest.state === 'SUPERSEDED') &&
+            pullRequest.closedBy === pullRequest.authorId &&
+            pullRequest.approvedBy.length === 0 &&
+            pullRequest.changesRequested === 0 &&
+            pullRequest.reviewerComments === 0,
           syncedAt,
         }
         tx.insert(pullRequests)
@@ -165,7 +175,25 @@ export const createPullRequestsHandlers = (db: Db, settings: ProviderSettings) =
           .map(toPullRequest),
       )
     }
-    return sendJson(res, 200, { metrics: toMetrics(toDeliveries(rows), from, to) })
+    const deliveries = toDeliveries(rows)
+    if (params.get('detail') !== '1') return sendJson(res, 200, { metrics: toMetrics(deliveries, from, to) })
+
+    const names = new Map(db.select().from(repositories).all().map((repository) => [repository.id, repository.name]))
+    const detail = deliveries
+      .filter((delivery) => delivery.openedAt >= from && delivery.openedAt < to)
+      .sort((a, b) => a.openedAt.localeCompare(b.openedAt))
+      .map((delivery) => ({
+        repository: names.get(delivery.pullRequests[0].repositoryId),
+        ticketKey: delivery.ticketKey,
+        destinationBranch: delivery.destinationBranch,
+        openedAt: delivery.openedAt,
+        firstAttempt: delivery.firstAttempt,
+        reworks: delivery.reworks,
+        reviewerComments: delivery.reviewerComments,
+        reviewers: delivery.reviewers,
+        pullRequests: delivery.pullRequests.map((pullRequest) => `#${pullRequest.externalId} ${pullRequest.state}`),
+      }))
+    return sendJson(res, 200, { metrics: toMetrics(deliveries, from, to), deliveries: detail })
   }
 
   return {

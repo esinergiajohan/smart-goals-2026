@@ -21,9 +21,15 @@ interface BitbucketPullRequest {
 }
 
 interface BitbucketActivity {
-  update?: { state: PullRequestState; date: string; source?: { commit?: { hash: string } } }
+  update?: {
+    state: PullRequestState
+    date: string
+    author?: { display_name: string; uuid?: string }
+    source?: { commit?: { hash: string } }
+  }
   approval?: { user: { display_name: string } }
   changes_request?: { user: { display_name: string } }
+  comment?: { user?: { uuid: string } }
 }
 
 interface Page<T> {
@@ -124,6 +130,12 @@ export const createBitbucketProvider = (remoteUrl: string, envFile: string): Git
       ],
       changesRequested: activity.filter((entry) => entry.changes_request).length,
       pushesAfterOpen: Math.max(pushedCommits.size - 1, 0),
+      reviewerComments: activity.filter(
+        (entry) => entry.comment && entry.comment.user?.uuid !== pullRequest.author.uuid,
+      ).length,
+      ...(closing?.update?.author?.uuid && { closedBy: closing.update.author.uuid }),
+      ...(pullRequest.state === 'MERGED' &&
+        closing?.update?.author && { mergedBy: closing.update.author.display_name }),
     }
   }
 

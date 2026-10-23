@@ -29,6 +29,20 @@
       "when": 1792715008366,
       "tag": "0003_plans",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1792716065104,
+      "tag": "0004_pull_request_reviewers",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1792719994318,
+      "tag": "0005_pull_request_self_closed",
+      "breakpoints": true
     }
   ]
 }

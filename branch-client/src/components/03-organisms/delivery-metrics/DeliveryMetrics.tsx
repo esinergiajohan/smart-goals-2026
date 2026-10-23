@@ -47,6 +47,11 @@ export function DeliveryMetrics() {
         })}
       </dl>
 
+      <p className="delivery-metrics__note">
+        Una entrega es un ticket hacia staging o develop. Es primer intento si se resolvió con un solo PR, sin
+        «Request changes» ni pushes después de abrirlo. No cuentan los PR que cerraste tú sin revisión.
+      </p>
+
       <Button onClick={sync} disabled={syncing}>
         {syncing ? 'Sincronizando…' : 'Sincronizar PR'}
       </Button>

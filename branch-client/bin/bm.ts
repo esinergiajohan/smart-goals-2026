@@ -32,7 +32,7 @@ Uso: bm <comando> [opciones] [--json]
   plans KEY                                Planes generados para la card (el último completo)
   plan-publish KEY                         Publica el último plan como nota interna en Jira (pide permiso al usuario)
   prs KEY [--sync]                         PR de la card y si cada entrega salió al primer intento
-  metrics [--sync] [--from AAAA-MM-DD --to AAAA-MM-DD]
+  metrics [--sync] [--detail] [--from AAAA-MM-DD --to AAAA-MM-DD]
                                            PR aprobados sin retrabajo (por defecto línea base y meta)
 
 Códigos de salida de «review --wait»: 0 aprobado, 2 rechazado, 3 no concluyente, 1 error.
@@ -44,6 +44,7 @@ const { values: options, positionals } = parseArgs({
     json: { type: 'boolean' },
     wait: { type: 'boolean' },
     sync: { type: 'boolean' },
+    detail: { type: 'boolean' },
     from: { type: 'string' },
     to: { type: 'string' },
     help: { type: 'boolean', short: 'h' },
@@ -316,23 +317,34 @@ const commands: Record<string, (args: string[]) => Promise<number | void>> = {
         await request('/pull-requests/sync', { method: 'POST', body: { from: period.from, to: period.to } })
       }
     }
+    interface DeliveryDetail {
+      repository: string
+      ticketKey: string
+      destinationBranch: string
+      firstAttempt: boolean | null
+      reworks: number
+      reviewerComments: number
+      reviewers: string[]
+      pullRequests: string[]
+    }
     const results = await Promise.all(
-      periods.map(async (period) => ({
-        period,
-        metrics: (
-          await request<{ metrics: DeliveryMetrics }>(
-            `/metrics?${new URLSearchParams({ from: period.from, to: period.to })}`,
-          )
-        ).metrics,
-      })),
+      periods.map(async (period) => {
+        const params = new URLSearchParams({ from: period.from, to: period.to, ...(options.detail && { detail: '1' }) })
+        const data = await request<{ metrics: DeliveryMetrics; deliveries?: DeliveryDetail[] }>(`/metrics?${params}`)
+        return { period, metrics: data.metrics, deliveries: data.deliveries ?? [] }
+      }),
     )
+    const line = (item: DeliveryDetail) =>
+      `    ${item.firstAttempt === true ? '✓' : item.firstAttempt === null ? '·' : '✗'} ${item.repository} ${item.ticketKey} → ${item.destinationBranch}` +
+      ` · correcciones ${item.reworks} · aclaraciones ${item.reviewerComments} · ${item.reviewers.join(', ') || 'sin revisor'} · ${item.pullRequests.join(' ')}`
     print(
       [
         `PR aprobados sin retrabajo (meta ${formatRate(FIRST_ATTEMPT_TARGET)}):`,
-        ...results.map(
-          ({ period, metrics }) =>
-            `  ${period.label}: ${formatRate(metrics.rate)} (${metrics.firstAttempt} de ${metrics.closed} entregas)`,
-        ),
+        ...results.flatMap(({ period, metrics, deliveries }) => [
+          `  ${period.label}: ${formatRate(metrics.rate)} (${metrics.firstAttempt} de ${metrics.closed} entregas)` +
+            ` · aclaraciones del revisor: ${metrics.reviewerComments}`,
+          ...deliveries.map(line),
+        ]),
       ].join('\n'),
       results,
     )

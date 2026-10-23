@@ -13,6 +13,9 @@ export interface RemotePullRequest {
   approvedBy: string[]
   changesRequested: number
   pushesAfterOpen: number
+  reviewerComments: number
+  mergedBy?: string
+  closedBy?: string
 }
 
 export interface PullRequestQuery {

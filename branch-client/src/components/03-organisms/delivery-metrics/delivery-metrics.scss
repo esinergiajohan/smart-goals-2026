@@ -67,6 +67,13 @@
     font-weight: $font-weight-regular;
   }
 
+  &__note {
+    flex: 1 1 18rem;
+    color: $color-text-subtle;
+    font-size: $font-size-xs;
+    line-height: 1.5;
+  }
+
   &__error {
     flex-basis: 100%;
     color: $color-danger;

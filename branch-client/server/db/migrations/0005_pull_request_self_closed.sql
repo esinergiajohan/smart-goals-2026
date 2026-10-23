@@ -1,0 +1,1 @@
+ALTER TABLE `pull_requests` ADD `self_closed` integer DEFAULT false NOT NULL;
