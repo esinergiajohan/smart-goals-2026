@@ -14,6 +14,7 @@ import { DeliveryBadges } from '../../02-molecules/delivery-badges/DeliveryBadge
 import { MetaItem } from '../../02-molecules/meta-item/MetaItem.tsx'
 import { FeaturedComment } from '../featured-comment/FeaturedComment.tsx'
 import { TicketBranches as TicketBranchesPanel } from '../ticket-branches/TicketBranches.tsx'
+import { TicketPlan } from '../ticket-plan/TicketPlan.tsx'
 import { TicketReview } from '../ticket-review/TicketReview.tsx'
 import './ticket-card.scss'
 
@@ -85,6 +86,8 @@ export function TicketCard({
         commentId={ticket.featuredCommentId}
         onChange={(commentId) => onFeaturedCommentChange(ticket.key, commentId)}
       />
+
+      <TicketPlan ticketKey={ticket.key} />
 
       <TicketBranchesPanel ticket={ticket} onChange={(branches) => onBranchesChange(ticket.key, branches)} />
 

@@ -1,6 +1,7 @@
 import { integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
 import type { ReviewResult, ReviewRole, ReviewStatus } from '../../src/types/review.ts'
 import type { TicketBranches } from '../../src/types/jira.ts'
+import type { PlanContent, PlanStatus } from '../../src/types/plan.ts'
 import type { PullRequestState } from '../../src/types/pullRequest.ts'
 
 export const repositories = sqliteTable('repositories', {
@@ -78,3 +79,19 @@ export const pullRequests = sqliteTable(
   },
   (table) => [uniqueIndex('pull_requests_repository_external').on(table.repositoryId, table.externalId)],
 )
+
+export const plans = sqliteTable('plans', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  ticketKey: text('ticket_key').notNull(),
+  repositoryId: integer('repository_id').references(() => repositories.id),
+  status: text('status').$type<PlanStatus>().notNull(),
+  content: text('content', { mode: 'json' }).$type<PlanContent>(),
+  outputDir: text('output_dir'),
+  error: text('error'),
+  costUsd: real('cost_usd'),
+  jiraCommentId: text('jira_comment_id'),
+  jiraCommentUrl: text('jira_comment_url'),
+  createdAt: text('created_at').notNull(),
+  startedAt: text('started_at'),
+  finishedAt: text('finished_at'),
+})

@@ -1,6 +1,7 @@
 import { setTimeout as sleep } from 'node:timers/promises'
 import { parseArgs } from 'node:util'
 import type { JiraTicket, TicketBranches, TrackedTicket } from '../src/types/jira.ts'
+import type { Plan } from '../src/types/plan.ts'
 import type { Delivery, DeliveryMetrics } from '../src/types/pullRequest.ts'
 import type { Repository, Review } from '../src/types/review.ts'
 import { BASELINE_PERIOD, FIRST_ATTEMPT_TARGET, formatRate, GOAL_PERIOD } from '../src/utils/goals.ts'
@@ -27,6 +28,9 @@ Uso: bm <comando> [opciones] [--json]
   review KEY [--wait]                      PR simulado: pr-review + Claude sobre <rama de trabajo>-test
                                            contra la rama de producción del repo
 
+  plan KEY [--wait]                        Plan de abordaje: lee el ticket en Jira y aplica los criterios de pr-review
+  plans KEY                                Planes generados para la card (el último completo)
+  plan-publish KEY                         Publica el último plan como nota interna en Jira (pide permiso al usuario)
   prs KEY [--sync]                         PR de la card y si cada entrega salió al primer intento
   metrics [--sync] [--from AAAA-MM-DD --to AAAA-MM-DD]
                                            PR aprobados sin retrabajo (por defecto línea base y meta)
@@ -142,6 +146,39 @@ const describeDelivery = (delivery: Delivery) => {
   return `${delivery.ticketKey} → ${delivery.destinationBranch}: ${status} (${pullRequests})`
 }
 
+const describePlan = (plan: Plan) => {
+  if (plan.status !== 'done' || !plan.content) {
+    return `#${plan.id} · ${plan.status}${plan.error ? ` · ${plan.error}` : ''}`
+  }
+  const content = plan.content
+  const section = (title: string, items: string[]) => (items.length ? [`${title}:`, ...items.map((item) => `  - ${item}`)] : [])
+  return [
+    `#${plan.id} · ${content.ticket_type} · ${content.summary}`,
+    ...section(
+      'Criterios',
+      content.acceptance_criteria.map((item) => `${item.criterion} (${item.source})`),
+    ),
+    ...section(
+      'Preguntas',
+      content.questions.map((item) => `${item.question} → ${item.to}`),
+    ),
+    ...section('Alcance', content.scope_in),
+    ...section('Fuera de alcance', content.scope_out),
+    ...section('Áreas', content.affected_areas.map((item) => `${item.location}: ${item.reason}`)),
+    ...section('Pasos', content.approach),
+    ...section('Riesgos', content.risks.map((item) => `${item.risk} → ${item.mitigation}`)),
+    `Despliegue: ${content.deploy_expectation}`,
+    ...section('QA', content.qa_checks),
+    ...section('pr-review', content.pr_review_watchpoints),
+    ...(plan.jiraCommentUrl ? [`Jira: ${plan.jiraCommentUrl}`] : []),
+  ].join('\n')
+}
+
+const latestPlan = async (key: string) => {
+  const { plans } = await request<{ plans: Plan[] }>(`/plans?${new URLSearchParams({ ticket: key })}`)
+  return plans[plans.length - 1]
+}
+
 const commands: Record<string, (args: string[]) => Promise<number | void>> = {
   async health() {
     const { repositories } = await request<{ repositories: Repository[] }>('/repositories')
@@ -230,6 +267,35 @@ const commands: Record<string, (args: string[]) => Promise<number | void>> = {
     }
 
     throw new CliError('Uso: bm card add|set|rm KEY')
+  },
+
+  async plan([rawKey]) {
+    const key = requireKey(rawKey)
+    const { plan } = await request<{ plan: Plan }>('/plans', { method: 'POST', body: { ticketKey: key } })
+    if (!options.wait) return print(`Plan #${plan.id} en cola para ${key}.`, plan)
+    for (;;) {
+      const current = await latestPlan(key)
+      if (current && current.id === plan.id && (current.status === 'done' || current.status === 'failed')) {
+        print(describePlan(current), current)
+        return current.status === 'done' ? EXIT.ok : EXIT.error
+      }
+      if (!options.json) console.error(`… ${current?.status ?? 'queued'} (${new Date().toLocaleTimeString()})`)
+      await sleep(POLL_MS)
+    }
+  },
+
+  async plans([rawKey]) {
+    const key = requireKey(rawKey)
+    const plan = await latestPlan(key)
+    print(plan ? describePlan(plan) : `No hay planes para ${key}.`, plan ?? null)
+  },
+
+  async 'plan-publish'([rawKey]) {
+    const key = requireKey(rawKey)
+    const plan = await latestPlan(key)
+    if (!plan || plan.status !== 'done') throw new CliError(`No hay un plan listo para ${key}.`)
+    const { plan: published } = await request<{ plan: Plan }>(`/plans/${plan.id}/publish`, { method: 'POST', body: {} })
+    print(`Plan publicado en Jira: ${published.jiraCommentUrl}`, published)
   },
 
   async prs([rawKey]) {

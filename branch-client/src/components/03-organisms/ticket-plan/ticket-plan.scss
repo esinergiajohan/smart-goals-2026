@@ -1,0 +1,110 @@
+@use '../../00-base' as *;
+
+.ticket-plan {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  font-size: $font-size-sm;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-3;
+  }
+
+  &__title {
+    margin: 0;
+    color: $color-emerald-300;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__error {
+    color: $color-danger;
+    white-space: pre-line;
+  }
+
+  &__plan {
+    border: 1px solid $color-border;
+    border-left: 4px solid $color-emerald-400;
+    border-radius: $radius-sm;
+    background: $color-surface-raised;
+  }
+
+  &__summary {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: $space-1 $space-3;
+    padding: $space-2 $space-3;
+    line-height: 1.4;
+    cursor: pointer;
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+
+  &__type {
+    color: $color-emerald-300;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &__date {
+    grid-column: 1 / -1;
+    color: $color-text-subtle;
+    font-size: $font-size-xs;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+    padding: 0 $space-3 $space-3;
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  &__heading {
+    margin: 0;
+    color: $color-text-muted;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    margin: 0;
+    padding-left: $space-4;
+    line-height: 1.5;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: $space-3;
+  }
+
+  &__link {
+    color: $color-accent;
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+}

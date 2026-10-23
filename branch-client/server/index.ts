@@ -7,6 +7,8 @@ import { CARDS_ROUTE, createCardsHandler } from './cards-api.ts'
 import { openDatabase } from './db/client.ts'
 import { HttpError, sendJson } from './http.ts'
 import { createJiraRoutes } from './jira-api.ts'
+import { createPlanRunner } from './plan-runner.ts'
+import { createPlansHandler, PLANS_ROUTE } from './plans-api.ts'
 import {
   createPullRequestsHandlers,
   METRICS_ROUTE,
@@ -31,7 +33,7 @@ const db = openDatabase(process.env.BRANCH_DB_PATH ?? `${ROOT_DIR}data/branch-ma
 const jiraRoutes = createJiraRoutes(process.env)
 const cardsHandler = createCardsHandler(db)
 const repositoriesHandler = createRepositoriesHandler(db)
-const reviewRunner = createReviewRunner(db, {
+const reviewConfig = {
   kitHome: process.env.PR_REVIEW_KIT_HOME ?? DEFAULT_KIT_HOME,
   reviewsDir: process.env.BRANCH_REVIEWS_DIR ?? join(homedir(), '.branch-manager', 'reviews'),
   pythonBin: process.env.PR_REVIEW_PYTHON ?? 'python3',
@@ -39,8 +41,10 @@ const reviewRunner = createReviewRunner(db, {
   claudeConfigDir: process.env.BRANCH_CLAUDE_CONFIG_DIR ?? process.env.CLAUDE_CONFIG_DIR,
   model: process.env.BRANCH_REVIEW_MODEL,
   jiraEnv: process.env,
-})
+}
+const reviewRunner = createReviewRunner(db, reviewConfig)
 const reviewsHandler = createReviewsHandler(db, reviewRunner)
+const plansHandler = createPlansHandler(db, createPlanRunner(db, reviewConfig), process.env)
 const pullRequestsHandlers = createPullRequestsHandlers(db, {
   bitbucketEnvFile: process.env.BITBUCKET_ENV_FILE ?? '/Volumes/KINGSTON/7777/gitHub/bitbucket-mvp/.env',
 })
@@ -68,6 +72,7 @@ const server = createServer(async (req, res) => {
     if (pathname === REVIEWS_ROUTE) return await reviewsHandler(req, res)
     if (pathname === PULL_REQUESTS_ROUTE) return await pullRequestsHandlers.pullRequests(req, res)
     if (pathname === PULL_REQUESTS_SYNC_ROUTE) return await pullRequestsHandlers.sync(req, res)
+    if (pathname === PLANS_ROUTE || pathname.startsWith(`${PLANS_ROUTE}/`)) return await plansHandler(req, res, pathname)
     if (pathname === METRICS_ROUTE) return await pullRequestsHandlers.metrics(req, res)
 
     throw new HttpError(404, 'Ruta no encontrada.')

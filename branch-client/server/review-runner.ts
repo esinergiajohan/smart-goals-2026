@@ -39,7 +39,7 @@ interface ClaudeOutput {
 
 const KIT_TIMEOUT_MS = 5 * 60_000
 const CLAUDE_TIMEOUT_MS = 30 * 60_000
-const READ_ONLY_TOOLS = [
+export const READ_ONLY_TOOLS = [
   'Read',
   'Grep',
   'Glob',
@@ -63,13 +63,13 @@ const KIT_SHIM = [
   "runpy.run_path(sys.argv[0], run_name='__main__')",
 ].join('\n')
 
-const now = () => new Date().toISOString()
+export const now = () => new Date().toISOString()
 
-const stamp = () => now().replace(/[-:]/g, '').replace(/\..+$/, '').replace('T', '-')
+export const stamp = () => now().replace(/[-:]/g, '').replace(/\..+$/, '').replace('T', '-')
 
-const tail = (text: string, length = 1500) => text.trim().slice(-length)
+export const tail = (text: string, length = 1500) => text.trim().slice(-length)
 
-const kitPaths = (kitHome: string) => {
+export const kitPaths = (kitHome: string) => {
   const template = join(kitHome, 'templates', 'repo')
   return {
     cli: join(kitHome, 'bin', 'ai-pr-review'),

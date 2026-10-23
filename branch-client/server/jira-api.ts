@@ -290,6 +290,86 @@ export const fetchIssueBrief = async (env: JiraEnv, key: string) => {
   ].join('\n')
 }
 
+interface IssueWithContext {
+  key: string
+  fields: {
+    summary: string
+    description?: AdfNode | string
+    issuetype?: { name: string }
+    status?: { name: string }
+    priority?: { name: string }
+    parent?: { key: string }
+    subtasks?: Array<{ key: string; fields: { summary: string; status?: { name: string } } }>
+  }
+}
+
+const CONTEXT_FIELDS = 'summary,description,issuetype,status,priority,parent,subtasks'
+const CONTEXT_MAX_COMMENTS = 100
+const CONTEXT_PARENT_LEVELS = 2
+
+const cleanText = (body: AdfNode | string | undefined) =>
+  adfToText(body, '\n')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\s*\n\s*/g, '\n')
+    .trim()
+
+const describeIssue = async (context: JiraContext, issue: IssueWithContext, heading: string, withComments: boolean) => {
+  const lines = [
+    `${heading} ${issue.key} — ${issue.fields.summary}`,
+    '',
+    `- Tipo: ${issue.fields.issuetype?.name ?? 'No informado'}`,
+    `- Estado: ${issue.fields.status?.name ?? 'No informado'}`,
+    `- Prioridad: ${issue.fields.priority?.name ?? 'No informada'}`,
+    `- Enlace: ${context.baseUrl}/browse/${issue.key}`,
+    '',
+    cleanText(issue.fields.description) || 'Sin descripción.',
+    '',
+  ]
+  if (issue.fields.subtasks?.length) {
+    lines.push('Subtareas:', ...issue.fields.subtasks.map((sub) => `- ${sub.key} [${sub.fields.status?.name ?? ''}] ${sub.fields.summary}`), '')
+  }
+  if (withComments) {
+    const { comments } = await jiraGet<{ comments: JiraComment[] }>(
+      context,
+      `/rest/api/3/issue/${issue.key}/comment?orderBy=created&maxResults=${CONTEXT_MAX_COMMENTS}`,
+    )
+    lines.push(`Comentarios (${comments.length}, del más antiguo al más reciente):`, '')
+    for (const comment of comments) {
+      lines.push(`- ${comment.author?.displayName ?? 'Alguien'} · ${comment.created ?? ''}`, cleanText(comment.body) || '(sin texto)', '')
+    }
+  }
+  return lines.join('\n')
+}
+
+export const fetchIssueContext = async (env: JiraEnv, key: string) => {
+  const context = createJiraContext(env)
+  if (!context) throw new Error(MISSING_ENV)
+
+  const issue = await jiraGet<IssueWithContext>(context, `/rest/api/3/issue/${key}?fields=${CONTEXT_FIELDS}`)
+  const sections = [await describeIssue(context, issue, '# Ticket', true)]
+  let parentKey = issue.fields.parent?.key
+  for (let level = 0; parentKey && level < CONTEXT_PARENT_LEVELS; level++) {
+    const parent = await jiraGet<IssueWithContext>(context, `/rest/api/3/issue/${parentKey}?fields=${CONTEXT_FIELDS}`)
+    sections.push(await describeIssue(context, parent, level === 0 ? '# Padre' : '# Abuelo', level === 0))
+    parentKey = parent.fields.parent?.key
+  }
+  return { summary: issue.fields.summary, url: `${context.baseUrl}/browse/${key}`, markdown: sections.join('\n\n') }
+}
+
+export const saveInternalComment = async (env: JiraEnv, key: string, body: string, commentId?: string) => {
+  const context = createJiraContext(env)
+  if (!context) throw new Error(MISSING_ENV)
+
+  const response = await fetch(`${context.baseUrl}/rest/api/2/issue/${key}/comment${commentId ? `/${commentId}` : ''}`, {
+    method: commentId ? 'PUT' : 'POST',
+    headers: { ...context.headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ body, properties: [{ key: 'sd.public.comment', value: { internal: true } }] }),
+  })
+  if (!response.ok) throw new JiraHttpError(response.status)
+  const saved = (await response.json()) as { id: string }
+  return { id: saved.id, url: `${context.baseUrl}/browse/${key}?focusedCommentId=${saved.id}` }
+}
+
 export const createJiraRoutes = (env: JiraEnv): Record<string, (req: IncomingMessage, res: ServerResponse) => Promise<void>> => ({
   [SEARCH_ROUTE]: createSearchHandler(env),
   [ACTIVE_ROUTE]: createActiveHandler(env),
