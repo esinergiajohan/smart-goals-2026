@@ -236,8 +236,6 @@ sequenceDiagram
 
 # 🔧 Técnico
 
-### 🏗️ Arquitectura
-
 <img src="branch-client/public/docs/readme/arquitectura.svg" width="100%" alt="El tablero y la CLI usan la API local, que conecta SQLite, Jira, Bitbucket, GitHub, Claude y el kit pr-review"/>
 
 <table>
@@ -259,14 +257,13 @@ npm run dev
 
 ### 🔑 Variables
 
-| `.env` de la raíz | Para qué |
-|---|---|
-| `JIRA_BASE_URL` `JIRA_EMAIL` `JIRA_API_TOKEN` | Jira |
-| `BRANCH_CLAUDE_CONFIG_DIR` | Cuenta de Claude |
-| `BITBUCKET_ENV_FILE` | Bitbucket |
-| `PR_REVIEW_KIT_HOME` | Kit pr-review |
+<sub><code>.env</code> de la raíz (solo los nombres)</sub>
 
-<sub>GitHub usa la sesión de <code>gh</code>.</sub>
+- **Jira** · `JIRA_BASE_URL` `JIRA_EMAIL` `JIRA_API_TOKEN`
+- **Claude** · `BRANCH_CLAUDE_CONFIG_DIR`
+- **Bitbucket** · `BITBUCKET_ENV_FILE`
+- **Kit pr-review** · `PR_REVIEW_KIT_HOME`
+- **GitHub** · sesión de `gh`
 
 </td>
 </tr>
