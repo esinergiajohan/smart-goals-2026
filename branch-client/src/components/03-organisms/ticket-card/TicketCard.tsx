@@ -50,6 +50,7 @@ export function TicketCard({
   const bodyId = useId()
   const deployed = Boolean(ticket.deployedAt)
   const [confirming, setConfirming] = useState(false)
+  const [removing, setRemoving] = useState(false)
   const toggleRef = useRef<HTMLButtonElement>(null)
   const pullRequests = usePullRequests(ticket.key, Boolean(ticket.repositoryId))
   const [open, setOpen] = useState(!collapsible || focusToggle)
@@ -76,7 +77,8 @@ export function TicketCard({
           variant="ghost"
           className="ticket-card__remove"
           aria-label={`Borrar ${ticket.key}`}
-          onClick={() => onRemove(ticket.key)}
+          aria-haspopup="dialog"
+          onClick={() => setRemoving(true)}
         >
           Borrar
         </Button>
@@ -143,6 +145,24 @@ export function TicketCard({
           </footer>
         </div>
       )}
+
+      <ConfirmDialog
+        open={removing}
+        title={`¿Borrar la card ${ticket.key}?`}
+        confirmLabel="Sí, borrar"
+        confirmVariant="warning"
+        onCancel={() => setRemoving(false)}
+        onConfirm={() => {
+          setRemoving(false)
+          onRemove(ticket.key)
+        }}
+      >
+        <p className="ticket-card__dialog-summary">{ticket.summary}</p>
+        <p>
+          Se pierden las ramas, el comentario destacado y la justificación de cierre que guardaste en esta card. El
+          ticket sigue en Jira.
+        </p>
+      </ConfirmDialog>
 
       <ConfirmDialog
         open={confirming}

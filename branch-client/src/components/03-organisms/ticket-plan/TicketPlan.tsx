@@ -34,6 +34,7 @@ function PlanSection({ title, items }: { title: string; items: string[] }) {
 export function TicketPlan({ ticketKey }: TicketPlanProps) {
   const headingId = useId()
   const [confirming, setConfirming] = useState(false)
+  const [confirmingStart, setConfirmingStart] = useState(false)
   const { latest, active, error, start, publish } = usePlans(ticketKey)
   const content = latest?.status === 'done' ? latest.content : undefined
 
@@ -43,7 +44,7 @@ export function TicketPlan({ ticketKey }: TicketPlanProps) {
         <h4 id={headingId} className="ticket-plan__title">
           Plan de abordaje
         </h4>
-        <Button disabled={active} onClick={start}>
+        <Button disabled={active} aria-haspopup="dialog" onClick={() => setConfirmingStart(true)}>
           {content ? 'Regenerar plan' : 'Generar plan'}
         </Button>
       </div>
@@ -107,6 +108,23 @@ export function TicketPlan({ ticketKey }: TicketPlanProps) {
           </div>
         </details>
       )}
+
+      <ConfirmDialog
+        open={confirmingStart}
+        title={content ? `¿Regenerar el plan de ${ticketKey}?` : `¿Generar el plan de ${ticketKey}?`}
+        confirmLabel={content ? 'Sí, regenerar' : 'Sí, generar'}
+        onCancel={() => setConfirmingStart(false)}
+        onConfirm={() => {
+          setConfirmingStart(false)
+          void start()
+        }}
+      >
+        <p>
+          Claude lee el ticket en Jira y arma el plan con los criterios de pr-review. Tarda unos minutos y consume uso
+          de Claude.
+          {content && ' El plan actual queda en el historial.'}
+        </p>
+      </ConfirmDialog>
 
       <ConfirmDialog
         open={confirming}

@@ -1,8 +1,9 @@
-import { useId } from 'react'
+import { useId, useState } from 'react'
 import { useDeliveryMetrics } from '../../../hooks/useDeliveryMetrics.ts'
 import { BASELINE_PERIOD, FIRST_ATTEMPT_TARGET, formatRate, GOAL_PERIOD } from '../../../utils/goals.ts'
 import { classNames } from '../../../utils/classNames.ts'
 import { Button } from '../../01-atoms/button/Button.tsx'
+import { ConfirmDialog } from '../../02-molecules/confirm-dialog/ConfirmDialog.tsx'
 import './delivery-metrics.scss'
 
 const PERIODS = [BASELINE_PERIOD, GOAL_PERIOD]
@@ -10,6 +11,7 @@ const PERIODS = [BASELINE_PERIOD, GOAL_PERIOD]
 export function DeliveryMetrics() {
   const headingId = useId()
   const { metrics, syncing, error, sync } = useDeliveryMetrics(PERIODS)
+  const [confirming, setConfirming] = useState(false)
 
   return (
     <section className="delivery-metrics" aria-labelledby={headingId} aria-busy={syncing}>
@@ -52,7 +54,7 @@ export function DeliveryMetrics() {
         revisor, o si el revisor lo declinó. No cuentan los PR que cerraste tú sin revisión.
       </p>
 
-      <Button onClick={sync} disabled={syncing}>
+      <Button onClick={() => setConfirming(true)} disabled={syncing} aria-haspopup="dialog">
         {syncing ? 'Sincronizando…' : 'Sincronizar PR'}
       </Button>
 
@@ -61,6 +63,22 @@ export function DeliveryMetrics() {
           {error}
         </p>
       )}
+
+      <ConfirmDialog
+        open={confirming}
+        title="¿Sincronizar los PR?"
+        confirmLabel="Sí, sincronizar"
+        onCancel={() => setConfirming(false)}
+        onConfirm={() => {
+          setConfirming(false)
+          void sync()
+        }}
+      >
+        <p>
+          Consulta tus PR en Bitbucket, sin cambiar nada allá, y recalcula los indicadores. Puede tardar unos
+          segundos.
+        </p>
+      </ConfirmDialog>
     </section>
   )
 }

@@ -6,6 +6,7 @@ import type { Repository } from '../../../types/review.ts'
 import { resolveBranches } from '../../../utils/branches.ts'
 import { reviewTarget } from '../../../utils/review.ts'
 import { Button } from '../../01-atoms/button/Button.tsx'
+import { ConfirmDialog } from '../../02-molecules/confirm-dialog/ConfirmDialog.tsx'
 import { RepositoryForm } from '../../02-molecules/repository-form/RepositoryForm.tsx'
 import { ReviewIteration } from '../../02-molecules/review-iteration/ReviewIteration.tsx'
 import './ticket-review.scss'
@@ -23,6 +24,7 @@ export function TicketReview({ ticket, repositories, onRepositoryChange, onAddRe
   const headingId = useId()
   const selectId = useId()
   const [adding, setAdding] = useState(false)
+  const [confirming, setConfirming] = useState(false)
   const { reviews, active, error, start } = useReviews(ticket.key)
   const repository = repositories.find((item) => item.id === ticket.repositoryId)
   const target = repository && reviewTarget(resolveBranches(ticket), repository.productionBranch)
@@ -78,7 +80,8 @@ export function TicketReview({ ticket, repositories, onRepositoryChange, onAddRe
           <Button
             disabled={active}
             aria-label={`Revisar ${target.branch} hacia ${target.base}`}
-            onClick={() => start()}
+            aria-haspopup="dialog"
+            onClick={() => setConfirming(true)}
           >
             Revisar
           </Button>
@@ -99,6 +102,24 @@ export function TicketReview({ ticket, repositories, onRepositoryChange, onAddRe
             </li>
           ))}
         </ol>
+      )}
+
+      {target && (
+        <ConfirmDialog
+          open={confirming}
+          title={`¿Revisar ${target.branch}?`}
+          confirmLabel="Sí, revisar"
+          onCancel={() => setConfirming(false)}
+          onConfirm={() => {
+            setConfirming(false)
+            void start()
+          }}
+        >
+          <p>
+            Claude aplica pr-review en local sobre <code>{target.branch}</code> hacia <code>{target.base}</code>. Tarda
+            varios minutos y consume uso de Claude.
+          </p>
+        </ConfirmDialog>
       )}
     </section>
   )

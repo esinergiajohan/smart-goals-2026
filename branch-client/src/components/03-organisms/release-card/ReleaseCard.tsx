@@ -48,6 +48,7 @@ export function ReleaseCard({
   const [closureError, setClosureError] = useState<string>()
   const [confirmingDeploy, setConfirmingDeploy] = useState(false)
   const [open, setOpen] = useState(false)
+  const [confirmingRefresh, setConfirmingRefresh] = useState(false)
 
   if (focusKey !== lastFocus) {
     setLastFocus(focusKey)
@@ -86,7 +87,13 @@ export function ReleaseCard({
       <header className="release-card__header">
         <span className="release-card__tag">Release</span>
         {repositoryName && <span className="release-card__repo">{repositoryName}</span>}
-        <Button variant="ghost" className="release-card__refresh" disabled={loading} onClick={refresh}>
+        <Button
+          variant="ghost"
+          className="release-card__refresh"
+          disabled={loading}
+          aria-haspopup="dialog"
+          onClick={() => setConfirmingRefresh(true)}
+        >
           {loading ? 'Analizando…' : 'Actualizar'}
         </Button>
       </header>
@@ -164,6 +171,19 @@ export function ReleaseCard({
           </footer>
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmingRefresh}
+        title={`¿Actualizar ${group.branch}?`}
+        confirmLabel="Sí, actualizar"
+        onCancel={() => setConfirmingRefresh(false)}
+        onConfirm={() => {
+          setConfirmingRefresh(false)
+          refresh()
+        }}
+      >
+        <p>Vuelve a analizar con git las ramas de la release y redibuja el grafo. Puede tardar unos segundos.</p>
+      </ConfirmDialog>
 
       <ConfirmDialog
         open={confirmingDeploy}
