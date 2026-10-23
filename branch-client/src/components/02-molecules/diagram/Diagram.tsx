@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './diagram.scss'
 
 interface DiagramProps {
@@ -7,9 +7,10 @@ interface DiagramProps {
 }
 
 let initialized = false
+let queue: Promise<unknown> = Promise.resolve()
+let renders = 0
 
 export function Diagram({ title, definition }: DiagramProps) {
-  const id = useId().replace(/[^a-zA-Z0-9]/g, '')
   const containerRef = useRef<HTMLDivElement>(null)
   const [failed, setFailed] = useState(false)
 
@@ -50,7 +51,9 @@ export function Diagram({ title, definition }: DiagramProps) {
           })
           initialized = true
         }
-        const { svg } = await mermaid.render(`diagram-${id}`, definition)
+        const render = queue.then(() => mermaid.render(`diagram-${++renders}`, definition))
+        queue = render.catch(() => undefined)
+        const { svg } = await render
         if (!cancelled && containerRef.current) containerRef.current.innerHTML = svg
       })
       .catch(() => {
@@ -59,7 +62,7 @@ export function Diagram({ title, definition }: DiagramProps) {
     return () => {
       cancelled = true
     }
-  }, [definition, id])
+  }, [definition])
 
   return (
     <figure className="diagram">

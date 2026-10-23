@@ -35,6 +35,19 @@ y mide cuántos PR se aprueban sin devolución en todos los proyectos.
 
 <br/>
 
+> [!TIP]
+> ### Cómo leer las cifras
+>
+> | Cifra | Qué significa |
+> |---|---|
+> | **86,7 %** · PR aprobados sin retrabajo | De cada 100 PR que llegaron al líder, cuántos aprobó sin pedir cambios ni dejar comentarios. Octubre: 26 de 30. |
+> | **0,33 → 0,07** · Aclaraciones por PR | Promedio de dudas o correcciones del líder en cada PR. 0,33 es una cada 3 PR; 0,07 es una cada 15 PR. |
+> | **−80 %** · Reducción de aclaraciones | Cuánto bajaron las aclaraciones del líder frente a septiembre. |
+> | **pp** · Puntos porcentuales | La diferencia directa entre dos porcentajes: de 55,6 % a 86,7 % son +31,1 pp. |
+> | **★ Septiembre** · Línea base | El mes de referencia, trabajado sin pr-review. |
+
+<br/>
+
 ## Contenido
 
 | | |

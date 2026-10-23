@@ -17,6 +17,8 @@ const DESTINATIONS: Record<string, string> = { staging: 'Staging', develop: 'Dev
 
 const perPr = (period?: ReportPeriod) => period?.metrics.reviewerCommentsPerDelivery ?? null
 
+const everyPrs = (value: number | null) => (value ? Math.round(1 / value) : '—')
+
 const reduction = (before: number | null, after: number | null) =>
   before && after !== null ? (before - after) / before : null
 
@@ -280,6 +282,44 @@ export function ReportPage() {
                 </li>
               </ul>
             </div>
+          </section>
+
+          <section className="report__glossary" aria-labelledby="report-glossary-title">
+            <h2 id="report-glossary-title">Cómo leer las cifras</h2>
+            <dl>
+              <div>
+                <dt>{formatRate(goal.metrics.rate)} · PR aprobados sin retrabajo</dt>
+                <dd>
+                  De cada 100 PR que llegaron al líder, cuántos aprobó sin pedir cambios ni dejar comentarios. En octubre fueron{' '}
+                  {goal.metrics.firstAttempt} de {goal.metrics.closed}.
+                </dd>
+              </div>
+              <div>
+                <dt>
+                  {perPr(baseline)?.toFixed(2)} → {perPr(goal)?.toFixed(2)} · Aclaraciones por PR
+                </dt>
+                <dd>
+                  Promedio de dudas o correcciones que dejó el líder en cada PR. {perPr(baseline)?.toFixed(2)} es una cada{' '}
+                  {everyPrs(perPr(baseline))} PR; {perPr(goal)?.toFixed(2)} es una cada {everyPrs(perPr(goal))} PR.
+                </dd>
+              </div>
+              <div>
+                <dt>−{formatRate(clarificationDrop)} · Reducción de aclaraciones</dt>
+                <dd>Cuánto bajaron las aclaraciones del líder frente a septiembre.</dd>
+              </div>
+              <div>
+                <dt>pp · Puntos porcentuales</dt>
+                <dd>
+                  La diferencia directa entre dos porcentajes: de {formatRate(baseline.metrics.rate)} a{' '}
+                  {formatRate(goal.metrics.rate)} son +
+                  {(((goal.metrics.rate ?? 0) - (baseline.metrics.rate ?? 0)) * 100).toFixed(1)} pp.
+                </dd>
+              </div>
+              <div>
+                <dt>★ Septiembre · Línea base</dt>
+                <dd>El mes de referencia, trabajado sin pr-review.</dd>
+              </div>
+            </dl>
           </section>
 
           <section className="report__summary" aria-label="Resumen">
