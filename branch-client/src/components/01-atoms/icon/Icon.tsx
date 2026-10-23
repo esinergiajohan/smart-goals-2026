@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { classNames } from '../../../utils/classNames.ts'
 import './icon.scss'
 
-export type IconName = 'search' | 'calendar' | 'pencil' | 'rocket' | 'alert' | 'star'
+export type IconName = 'search' | 'calendar' | 'pencil' | 'rocket' | 'alert' | 'star' | 'check' | 'chevron'
 
 const shapes: Record<IconName, ReactNode> = {
   search: (
@@ -21,6 +21,13 @@ const shapes: Record<IconName, ReactNode> = {
     <>
       <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
       <path d="M12 9v4M12 17h.01" />
+    </>
+  ),
+  chevron: <path d="m6 9 6 6 6-6" />,
+  check: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m8 12 3 3 5-6" />
     </>
   ),
   star: <path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" />,

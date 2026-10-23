@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { usePullRequests } from '../../../hooks/usePullRequests.ts'
 import type { RepositoryDraft } from '../../../services/repositories.ts'
 import type { TicketBranches, TicketStatus, TrackedTicket } from '../../../types/jira.ts'
@@ -7,6 +7,7 @@ import { classNames } from '../../../utils/classNames.ts'
 import { Badge } from '../../01-atoms/badge/Badge.tsx'
 import { Button } from '../../01-atoms/button/Button.tsx'
 import { DateTime } from '../../01-atoms/date-time/DateTime.tsx'
+import { Icon } from '../../01-atoms/icon/Icon.tsx'
 import { StatusStrip } from '../../01-atoms/status-strip/StatusStrip.tsx'
 import { Toggle } from '../../01-atoms/toggle/Toggle.tsx'
 import { ConfirmDialog } from '../../02-molecules/confirm-dialog/ConfirmDialog.tsx'
@@ -23,6 +24,7 @@ interface TicketCardProps {
   status?: TicketStatus
   repositories: Repository[]
   focusToggle?: boolean
+  collapsible?: boolean
   onRemove: (key: string) => void
   onDeployChange: (key: string, deployed: boolean) => void
   onBranchesChange: (key: string, branches: Partial<TicketBranches>) => void
@@ -36,6 +38,7 @@ export function TicketCard({
   status,
   repositories,
   focusToggle = false,
+  collapsible = false,
   onRemove,
   onDeployChange,
   onBranchesChange,
@@ -44,17 +47,28 @@ export function TicketCard({
   onAddRepository,
 }: TicketCardProps) {
   const titleId = `ticket-card-${ticket.key}-title`
+  const bodyId = useId()
   const deployed = Boolean(ticket.deployedAt)
   const [confirming, setConfirming] = useState(false)
   const toggleRef = useRef<HTMLButtonElement>(null)
   const pullRequests = usePullRequests(ticket.key, Boolean(ticket.repositoryId))
+  const [open, setOpen] = useState(!collapsible || focusToggle)
+  const [lastFocus, setLastFocus] = useState(focusToggle)
+
+  if (focusToggle !== lastFocus) {
+    setLastFocus(focusToggle)
+    if (focusToggle) setOpen(true)
+  }
 
   useEffect(() => {
     if (focusToggle) toggleRef.current?.focus()
   }, [focusToggle])
 
   return (
-    <article className={classNames('ticket-card', deployed && 'ticket-card--deployed')} aria-labelledby={titleId}>
+    <article
+      className={classNames('ticket-card', deployed && 'ticket-card--deployed', !open && 'ticket-card--collapsed')}
+      aria-labelledby={titleId}
+    >
       <StatusStrip status={status} />
       <header className="ticket-card__header">
         <Badge>{ticket.key}</Badge>
@@ -69,49 +83,66 @@ export function TicketCard({
       </header>
 
       <h3 id={titleId} className="ticket-card__title">
-        {ticket.summary}
+        {collapsible ? (
+          <button
+            type="button"
+            className="ticket-card__toggle"
+            aria-expanded={open}
+            aria-controls={open ? bodyId : undefined}
+            onClick={() => setOpen((current) => !current)}
+          >
+            {ticket.summary}
+            <Icon name="chevron" className="ticket-card__chevron" />
+          </button>
+        ) : (
+          ticket.summary
+        )}
       </h3>
 
-      <dl className="ticket-card__meta">
-        <MetaItem icon="calendar" label="Creación">
-          <DateTime value={ticket.created} />
-        </MetaItem>
-        <MetaItem icon="pencil" label="Últ. interacción">
-          <DateTime value={ticket.updated} />
-        </MetaItem>
-      </dl>
+      {open && (
+        <div id={bodyId} className="ticket-card__body">
+          <dl className="ticket-card__meta">
+            <MetaItem icon="calendar" label="Creación">
+              <DateTime value={ticket.created} />
+            </MetaItem>
+            <MetaItem icon="pencil" label="Últ. interacción">
+              <DateTime value={ticket.updated} />
+            </MetaItem>
+          </dl>
 
-      <FeaturedComment
-        ticketKey={ticket.key}
-        commentId={ticket.featuredCommentId}
-        onChange={(commentId) => onFeaturedCommentChange(ticket.key, commentId)}
-      />
+          <FeaturedComment
+            ticketKey={ticket.key}
+            commentId={ticket.featuredCommentId}
+            onChange={(commentId) => onFeaturedCommentChange(ticket.key, commentId)}
+          />
 
-      <TicketPlan ticketKey={ticket.key} />
+          <TicketPlan ticketKey={ticket.key} />
 
-      <TicketBranchesPanel ticket={ticket} onChange={(branches) => onBranchesChange(ticket.key, branches)} />
+          <TicketBranchesPanel ticket={ticket} onChange={(branches) => onBranchesChange(ticket.key, branches)} />
 
-      <DeliveryBadges deliveries={pullRequests.deliveries} error={pullRequests.error} />
+          <TicketReview
+            ticket={ticket}
+            repositories={repositories}
+            onRepositoryChange={(repositoryId) => onRepositoryChange(ticket.key, repositoryId)}
+            onAddRepository={onAddRepository}
+          />
 
-      <TicketReview
-        ticket={ticket}
-        repositories={repositories}
-        onRepositoryChange={(repositoryId) => onRepositoryChange(ticket.key, repositoryId)}
-        onAddRepository={onAddRepository}
-      />
+          <DeliveryBadges deliveries={pullRequests.deliveries} error={pullRequests.error} />
 
-      <footer className="ticket-card__footer">
-        <Toggle
-          ref={toggleRef}
-          on={deployed}
-          icon="rocket"
-          aria-haspopup="dialog"
-          aria-describedby={titleId}
-          onClick={() => setConfirming(true)}
-        >
-          {deployed ? '¿Rollback?' : 'Desplegado en producción'}
-        </Toggle>
-      </footer>
+          <footer className="ticket-card__footer">
+            <Toggle
+              ref={toggleRef}
+              on={deployed}
+              icon="rocket"
+              aria-haspopup="dialog"
+              aria-describedby={titleId}
+              onClick={() => setConfirming(true)}
+            >
+              {deployed ? '¿Rollback?' : 'Desplegado en producción'}
+            </Toggle>
+          </footer>
+        </div>
+      )}
 
       <ConfirmDialog
         open={confirming}

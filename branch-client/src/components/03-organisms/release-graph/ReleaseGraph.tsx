@@ -6,6 +6,7 @@ import { classNames } from '../../../utils/classNames.ts'
 import { formatShortDate } from '../../../utils/formatDate.ts'
 import { BRANCH_ORIGIN_LABELS, describeBase, JOIN_METHOD_LABELS, mixedBranches } from '../../../utils/releases.ts'
 import { statusTone } from '../../../utils/status.ts'
+import { Icon } from '../../01-atoms/icon/Icon.tsx'
 import { Switch } from '../../01-atoms/switch/Switch.tsx'
 import './release-graph.scss'
 
@@ -32,7 +33,7 @@ const MIN_VIEW_WIDTH = 400
 const NODE_WIDTH = { min: 200, max: 290, share: 0.6 }
 const NAME_CHAR_WIDTH = 6.7
 const NODE_HEIGHT = 56
-const CLOSURE_ROW = 26
+const CLOSURE = { width: 46, height: 18, inset: 8 }
 const NODE_GAP = 8
 const FRAME = { width: 152, minHeight: 92, strip: 22, radius: 14, lineHeight: 13, spread: 0.6 }
 const EDGE_INSET = 18
@@ -188,8 +189,6 @@ export function ReleaseGraph({
 
   const showsClosure = ({ ticketKey }: GraphNode) =>
     Boolean(ticketKey && (closures[ticketKey] || (statuses[ticketKey] && statuses[ticketKey].category !== 'done')))
-  const heights = nodes.map((node) => NODE_HEIGHT + (showsClosure(node) ? CLOSURE_ROW : 0))
-  const offsets = heights.map((_, index) => heights.slice(0, index).reduce((sum, height) => sum + height + NODE_GAP, 0))
 
   const handleKey = (key: string) => (event: KeyboardEvent<SVGGElement>) => {
     if (event.key !== 'Enter' && event.key !== ' ') return
@@ -209,12 +208,12 @@ export function ReleaseGraph({
     },
   ]
 
-  const nodesHeight = nodes.length ? offsets[nodes.length - 1] + heights[nodes.length - 1] : 0
+  const nodesHeight = nodes.length ? nodes.length * NODE_HEIGHT + (nodes.length - 1) * NODE_GAP : 0
   const frameHeight = Math.max(FRAME.minHeight, nodesHeight * FRAME.spread)
   const contentHeight = Math.max(nodesHeight, frameHeight)
   const frameY = VIEW_PADDING + (contentHeight - frameHeight) / 2
   const nodesY = VIEW_PADDING + (contentHeight - nodesHeight) / 2
-  const nodeY = (index: number) => nodesY + offsets[index]
+  const nodeY = (index: number) => nodesY + index * (NODE_HEIGHT + NODE_GAP)
   const targetY = (index: number) =>
     nodes.length === 1
       ? frameY + frameHeight / 2
@@ -255,7 +254,7 @@ export function ReleaseGraph({
           const stroke = edgeStroke(node)
           if (!stroke) return null
           const tone = node.branch ? markerTone(node.branch) : 'release'
-          const fromY = nodeY(index) + heights[index] / 2
+          const fromY = nodeY(index) + NODE_HEIGHT / 2
           const toY = targetY(index)
           return (
             <g key={node.id} className={classNames('release-graph__link', `release-graph__link--${tone}`)}>
@@ -307,7 +306,7 @@ export function ReleaseGraph({
                 })}
               >
                 <title>{nodeTitle(node, status)}</title>
-                <rect width={layout.nodeWidth} height={heights[index]} rx="9" className="release-graph__box" />
+                <rect width={layout.nodeWidth} height={NODE_HEIGHT} rx="9" className="release-graph__box" />
                 <circle cx="12" cy="13" r="3.5" className="release-graph__dot" />
                 <text x="21" y="16" className="release-graph__role">
                   {nodeRole(node)}
@@ -335,16 +334,35 @@ export function ReleaseGraph({
                 )}
               </g>
               {ticketKey && showsClosure(node) && (
-                <foreignObject x="8" y={NODE_HEIGHT - 2} width={layout.nodeWidth - 16} height={CLOSURE_ROW}>
-                  <div className="release-graph__closure">
-                    <Switch checked={Boolean(closureUrl)} onChange={(checked) => onClosureChange(ticketKey, checked)}>
-                      {closureUrl ? 'Dada por finalizada' : 'Dar por finalizada'}
-                    </Switch>
-                    {closureUrl && (
-                      <a href={closureUrl} target="_blank" rel="noreferrer" className="release-graph__closure-link">
-                        Justificación
+                <foreignObject
+                  x={layout.nodeWidth - CLOSURE.width - CLOSURE.inset}
+                  y={BADGE.y + BADGE.height / 2 - CLOSURE.height / 2}
+                  width={CLOSURE.width}
+                  height={CLOSURE.height}
+                >
+                  <div className={classNames('release-graph__closure', closureUrl && 'release-graph__closure--on')}>
+                    {closureUrl ? (
+                      <a
+                        href={closureUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="release-graph__closure-icon"
+                        title="Ver la justificación en Jira"
+                        aria-label={`Ver en Jira por qué ${ticketKey} se dio por finalizada`}
+                      >
+                        <Icon name="check" />
                       </a>
+                    ) : (
+                      <span className="release-graph__closure-icon">
+                        <Icon name="check" />
+                      </span>
                     )}
+                    <Switch
+                      checked={Boolean(closureUrl)}
+                      title={closureUrl ? 'Dada por finalizada' : 'Dar por finalizada'}
+                      aria-label={`Dar por finalizada ${ticketKey}`}
+                      onChange={(checked) => onClosureChange(ticketKey, checked)}
+                    />
                   </div>
                 </foreignObject>
               )}

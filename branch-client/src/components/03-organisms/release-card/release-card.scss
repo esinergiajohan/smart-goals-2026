@@ -46,6 +46,47 @@
     font-weight: $font-weight-bold;
   }
 
+  &__toggle {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $space-3;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:focus-visible {
+      @include focus-ring;
+      border-radius: $radius-sm;
+    }
+  }
+
+  &__chevron {
+    margin-top: 0.2em;
+    color: $color-branch-release;
+    transition: transform $transition-base;
+
+    [aria-expanded='true'] > & {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__summary {
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+  }
+
   &__alert {
     padding: $space-2 $space-3;
     border: 1px solid $color-danger-border;

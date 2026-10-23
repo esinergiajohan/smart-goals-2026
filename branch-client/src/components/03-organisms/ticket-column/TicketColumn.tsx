@@ -48,12 +48,13 @@ export function TicketColumn({
   const releaseOf = new Map(releases.flatMap((group) => group.ticketKeys.map((key) => [key, group])))
   const repositoryNames = new Map(repositories.map((repository) => [repository.id, repository.name]))
 
-  const renderTicket = (ticket: TrackedTicket, focusToggle: boolean) => (
+  const renderTicket = (ticket: TrackedTicket, focusToggle: boolean, collapsible = false) => (
     <TicketCard
       ticket={ticket}
       status={statuses[ticket.key]}
       repositories={repositories}
       focusToggle={focusToggle}
+      collapsible={collapsible}
       onRemove={onRemove}
       onDeployChange={onDeployChange}
       onBranchesChange={onBranchesChange}
@@ -83,7 +84,7 @@ export function TicketColumn({
         <ul role="list" className="ticket-column__list">
           {tickets.map((ticket) => {
             const group = releaseOf.get(ticket.key)
-            if (!group) return <li key={ticket.key}>{renderTicket(ticket, ticket.key === focusKey)}</li>
+            if (!group) return <li key={ticket.key}>{renderTicket(ticket, ticket.key === focusKey, true)}</li>
             if (group.ticketKeys[0] !== ticket.key) return null
             return (
               <li key={releaseId(group)}>

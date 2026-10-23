@@ -2,9 +2,11 @@ import { useId, useState, type ReactNode } from 'react'
 import { useReleaseGraph } from '../../../hooks/useReleaseGraph.ts'
 import type { TicketStatus, TrackedTicket } from '../../../types/jira.ts'
 import type { ReleaseGroup } from '../../../types/release.ts'
+import { classNames } from '../../../utils/classNames.ts'
 import { parseCommentUrl } from '../../../utils/commentUrl.ts'
 import { BRANCH_ORIGIN_LABELS, familyOf, mixedBranches, releaseFamily } from '../../../utils/releases.ts'
 import { Button } from '../../01-atoms/button/Button.tsx'
+import { Icon } from '../../01-atoms/icon/Icon.tsx'
 import { Input } from '../../01-atoms/input/Input.tsx'
 import { Toggle } from '../../01-atoms/toggle/Toggle.tsx'
 import { ConfirmDialog } from '../../02-molecules/confirm-dialog/ConfirmDialog.tsx'
@@ -34,6 +36,7 @@ export function ReleaseCard({
   onClosureChange,
 }: ReleaseCardProps) {
   const titleId = useId()
+  const bodyId = useId()
   const urlId = useId()
   const urlErrorId = useId()
   const { graph, error, loading, refresh } = useReleaseGraph(group)
@@ -44,6 +47,7 @@ export function ReleaseCard({
   const [closureDraft, setClosureDraft] = useState('')
   const [closureError, setClosureError] = useState<string>()
   const [confirmingDeploy, setConfirmingDeploy] = useState(false)
+  const [open, setOpen] = useState(false)
 
   if (focusKey !== lastFocus) {
     setLastFocus(focusKey)
@@ -78,7 +82,7 @@ export function ReleaseCard({
   }
 
   return (
-    <article className="release-card" aria-labelledby={titleId}>
+    <article className={classNames('release-card', !open && 'release-card--collapsed')} aria-labelledby={titleId}>
       <header className="release-card__header">
         <span className="release-card__tag">Release</span>
         {repositoryName && <span className="release-card__repo">{repositoryName}</span>}
@@ -88,9 +92,28 @@ export function ReleaseCard({
       </header>
 
       <h3 id={titleId} className="release-card__title">
-        {group.branch}
+        <button
+          type="button"
+          className="release-card__toggle"
+          aria-expanded={open}
+          aria-controls={open ? bodyId : undefined}
+          onClick={() => setOpen((current) => !current)}
+        >
+          {group.branch}
+          <Icon name="chevron" className="release-card__chevron" />
+        </button>
       </h3>
 
+      {!open && (
+        <p className="release-card__summary">
+          {tickets.length} cards ·{' '}
+          {deployed
+            ? 'desplegada'
+            : unfinished.length
+              ? `faltan ${unfinished.length} por finalizar`
+              : 'lista para desplegar'}
+        </p>
+      )}
 
       {graph && mixed.length > 0 && (
         <p role="alert" className="release-card__alert">
@@ -106,37 +129,41 @@ export function ReleaseCard({
         </p>
       )}
 
-      {graph ? (
-        <ReleaseGraph
-          graph={graph}
-          ticketKeys={group.ticketKeys}
-          statuses={statuses}
-          selected={selected}
-          closures={closures}
-          onSelect={setSelected}
-          onClosureChange={handleClosureChange}
-        />
-      ) : (
-        !error && <p className="release-card__loading">Analizando las ramas de la release…</p>
-      )}
+      {open && (
+        <div id={bodyId} className="release-card__body">
+          {graph ? (
+            <ReleaseGraph
+              graph={graph}
+              ticketKeys={group.ticketKeys}
+              statuses={statuses}
+              selected={selected}
+              closures={closures}
+              onSelect={setSelected}
+              onClosureChange={handleClosureChange}
+            />
+          ) : (
+            !error && <p className="release-card__loading">Analizando las ramas de la release…</p>
+          )}
 
-      <footer className="release-card__footer">
-        {deployed || !unfinished.length ? (
-          <Toggle
-            on={deployed}
-            icon="rocket"
-            aria-haspopup="dialog"
-            aria-describedby={titleId}
-            onClick={() => setConfirmingDeploy(true)}
-          >
-            {deployed ? '¿Rollback de la release?' : 'Desplegado en producción'}
-          </Toggle>
-        ) : (
-          <p className="release-card__pending">
-            Para desplegar, faltan por finalizar: {unfinished.map((ticket) => ticket.key).join(', ')}.
-          </p>
-        )}
-      </footer>
+          <footer className="release-card__footer">
+            {deployed || !unfinished.length ? (
+              <Toggle
+                on={deployed}
+                icon="rocket"
+                aria-haspopup="dialog"
+                aria-describedby={titleId}
+                onClick={() => setConfirmingDeploy(true)}
+              >
+                {deployed ? '¿Rollback de la release?' : 'Desplegado en producción'}
+              </Toggle>
+            ) : (
+              <p className="release-card__pending">
+                Para desplegar, faltan por finalizar: {unfinished.map((ticket) => ticket.key).join(', ')}.
+              </p>
+            )}
+          </footer>
+        </div>
+      )}
 
       <ConfirmDialog
         open={confirmingDeploy}

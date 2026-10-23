@@ -267,31 +267,51 @@ $release-graph-edges: (
   &__closure {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: $space-2;
+    justify-content: flex-end;
+    gap: 0.25rem;
     height: 100%;
-    border-top: 1px solid $color-border;
+    color: $color-text-subtle;
 
-    .switch__label {
-      font-size: 0.5625rem;
+    .switch {
+      gap: 0;
+      padding: 0;
     }
 
-    .switch--on {
-      color: $color-emerald-400;
+    .switch__label {
+      display: none;
+    }
+
+    .switch__track {
+      width: 1.5rem;
+      height: 0.875rem;
+    }
+
+    .switch__thumb {
+      width: 0.625rem;
+      height: 0.625rem;
+    }
+
+    .switch--on .switch__thumb {
+      transform: translateX(0.625rem);
     }
 
     .switch--on .switch__track {
       background: $color-emerald-400;
     }
+
+    &--on {
+      color: $color-emerald-400;
+    }
   }
 
-  &__closure-link {
-    color: $color-emerald-300;
-    font-size: 0.625rem;
-    white-space: nowrap;
+  &__closure-icon {
+    display: inline-flex;
+    color: inherit;
+    font-size: 0.875rem;
 
     &:focus-visible {
       @include focus-ring;
+      border-radius: 50%;
     }
   }
 
